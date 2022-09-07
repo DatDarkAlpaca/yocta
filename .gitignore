@@ -1,0 +1,9 @@
+# Visual Studio 2015/2017 cache/options directory
+.vs
+
+# Build results
+[Bb]in
+[Ii]ntermediate
+
+# User-specific files
+*.user
