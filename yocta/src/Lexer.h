@@ -52,7 +52,7 @@ namespace yo
 			}
 
 			// Handles digits:
-			if (std::isdigit(currentChar))
+			if (std::isdigit(currentChar) || currentChar == '.')
 			{
 				std::string text;
 				unsigned int dotCount = 0;
