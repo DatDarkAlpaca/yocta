@@ -22,9 +22,9 @@ namespace yo
 		void push_back(yocta_value constant, int lineNumber)
 		{
 			constantPool.push_back(constant);
-			int index = constantPool.size() - 1;
+			size_t index = constantPool.size() - 1;
 
-			data.push_back(index);
+			data.push_back((uint8_t)index);
 			lines.push_back(lineNumber);
 		}
 

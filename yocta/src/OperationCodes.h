@@ -23,5 +23,7 @@ namespace yo
 			case OPCode::OP_CONSTANT:
 				return "OP_CONSTANT";
 		}
+
+		return "";
 	}
 }

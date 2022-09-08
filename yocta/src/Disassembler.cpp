@@ -1,7 +1,7 @@
 #include "Disassembler.h"
 #include "OperationCodes.h"
 
-void yo::Disassembler::operator()(const Chunk& array, const char* instructionSetName)
+void yo::Disassembler::disassemble(const Chunk& array, const char* instructionSetName)
 {
 	printf("-=-= Operations : %s =-=-\n", instructionSetName);
 
@@ -39,7 +39,8 @@ unsigned int yo::Disassembler::simpleInstruction(uint8_t code, int offset)
 
 unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& chunk, int offset)
 {
-	uint8_t constant = chunk.data[offset + 1];
+	int off = ++offset;
+	uint8_t constant = chunk.data[off];
 	printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, chunk.constantPool[constant]);
 
 	return offset + 2;

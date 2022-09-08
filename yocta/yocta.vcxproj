@@ -158,10 +158,12 @@
     <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Common.h" />
     <ClInclude Include="src\Disassembler.h" />
     <ClInclude Include="src\Chunk.h" />
     <ClInclude Include="src\OperationCodes.h" />
     <ClInclude Include="src\Value.h" />
+    <ClInclude Include="src\VirtualMachine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
