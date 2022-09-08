@@ -18,7 +18,6 @@ namespace yo
 			while (true)
 			{
 #ifdef DEBUG_TRACE
-				printf("        ");
 				for (const yocta_value& value : vmStack)
 				{
 					printf("[");
@@ -50,6 +49,32 @@ namespace yo
 						break;
 					}
 
+					case (uint8_t)OPCode::OP_NEGATE: {
+						yocta_value back = vmStack.back();
+						vmStack.pop_back();
+						vmStack.push_back(-back);
+						break;
+					}
+
+					case (uint8_t)OPCode::OP_ADD: {
+						binaryOperation(OPCode::OP_ADD);
+						break;
+					}
+					
+					case (uint8_t)OPCode::OP_SUB: {
+						binaryOperation(OPCode::OP_SUB);
+						break;
+					}
+					
+					case (uint8_t)OPCode::OP_MULT: {
+						binaryOperation(OPCode::OP_MULT);
+						break;
+					}
+					
+					case (uint8_t)OPCode::OP_DIV: {
+						binaryOperation(OPCode::OP_DIV);
+						break;
+					}
 				}
 			}
 		}
@@ -63,6 +88,35 @@ namespace yo
 		yocta_value readConstant(const Chunk& chunk)
 		{
 			return chunk.constantPool[readByte()];
+		}
+
+	private:
+		void binaryOperation(OPCode operation)
+		{
+			yocta_value b = vmStack.back();
+			vmStack.pop_back();
+
+			yocta_value a = vmStack.back();
+			vmStack.pop_back();
+
+			switch (operation)
+			{
+				case OPCode::OP_ADD:
+					vmStack.push_back(a + b);
+					break;
+
+				case OPCode::OP_SUB:
+					vmStack.push_back(a - b);
+					break;
+
+				case OPCode::OP_MULT:
+					vmStack.push_back(a * b);
+					break;
+
+				case OPCode::OP_DIV:
+					vmStack.push_back(a / b);
+					break;
+			}
 		}
 
 	private:

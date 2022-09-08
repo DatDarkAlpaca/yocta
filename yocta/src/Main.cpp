@@ -16,7 +16,11 @@ int main()
 	chunk.push_back((uint8_t)OPCode::OP_CONSTANT, 124);
 	chunk.push_back(20.0, 124);
 
-	chunk.push_back((uint8_t)OPCode::OP_RETURN, 125);
+	chunk.push_back((uint8_t)OPCode::OP_NEGATE, 125);
+
+	chunk.push_back((uint8_t)OPCode::OP_ADD, 125);
+
+	chunk.push_back((uint8_t)OPCode::OP_RETURN, 126);
 
 	VirtualMachine vm;
 	vm.run(chunk);

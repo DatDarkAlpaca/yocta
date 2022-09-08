@@ -25,6 +25,21 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 	case (uint8_t)OPCode::OP_CONSTANT:
 		return constantInstruction(instruction, chunk, offset);
 
+	case (uint8_t)OPCode::OP_NEGATE:
+		return simpleInstruction(instruction, offset);
+
+	case (uint8_t)OPCode::OP_ADD:
+		return simpleInstruction(instruction, offset);
+
+	case (uint8_t)OPCode::OP_SUB:
+		return simpleInstruction(instruction, offset);
+
+	case (uint8_t)OPCode::OP_MULT:
+		return simpleInstruction(instruction, offset);
+
+	case (uint8_t)OPCode::OP_DIV:
+		return simpleInstruction(instruction, offset);
+
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
 		return offset + 1;
