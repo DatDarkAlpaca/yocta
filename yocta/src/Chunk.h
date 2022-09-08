@@ -13,16 +13,19 @@ namespace yo
 		Chunk() = default;
 
 	public:
-		void push_back(uint8_t opcode)
+		void push_back(uint8_t opcode, int lineNumber)
 		{
 			data.push_back(opcode);
+			lines.push_back(lineNumber);
 		}
 
-		void push_back(yocta_value constant)
+		void push_back(yocta_value constant, int lineNumber)
 		{
 			constantPool.push_back(constant);
 			int index = constantPool.size() - 1;
+
 			data.push_back(index);
+			lines.push_back(lineNumber);
 		}
 
 		void clear()
@@ -32,6 +35,7 @@ namespace yo
 		}
 
 	public:
+		std::vector<int> lines;
 		std::vector<uint8_t> data;
 		std::vector<yocta_value> constantPool;
 	};

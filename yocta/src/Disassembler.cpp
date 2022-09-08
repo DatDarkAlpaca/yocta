@@ -6,9 +6,7 @@ void yo::Disassembler::operator()(const Chunk& array, const char* instructionSet
 	printf("-=-= Operations : %s =-=-\n", instructionSetName);
 
 	for (unsigned int offset = 0; offset < array.data.size();)
-	{
 		offset = disassembleInstruction(array, offset);
-	}
 }
 
 unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int offset)
@@ -16,6 +14,8 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 	printf("%04d\t", offset);
 
 	uint8_t instruction = chunk.data[offset];
+
+	printf("%04d\t", chunk.lines[offset]);
 
 	switch (instruction)
 	{
