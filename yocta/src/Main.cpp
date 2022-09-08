@@ -13,7 +13,7 @@ void inlineInterpreter()
 
 	while (true)
 	{
-		printf(">");
+		printf("> ");
 
 		char line[1024];
 		if (!fgets(line, sizeof(line), stdin)) 
