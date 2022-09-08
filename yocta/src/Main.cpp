@@ -47,17 +47,8 @@ void runFile(const char* filepath)
 	yo::VirtualMachine vm;
 
 	std::string src = readFile(filepath);
-	printf("%s", src.c_str());
 
-	//InterpretResult result = interpret(source);
-	
-
-	/*if (result == INTERPRET_COMPILE_ERROR) 
-		exit(65);
-	if (result == INTERPRET_RUNTIME_ERROR) 
-		exit(70);*/
-
-	//InterpretResult result = interpret(source);
+	vm.interpret(src.c_str());
 }
 
 int main(int argc, char** argv)
