@@ -41,6 +41,22 @@ namespace yo
 
 		void binary();
 
+		void literalType()
+		{
+			switch (parser.previous.type)
+			{
+				case Token::Type::T_NONE:
+					emitByte((uint8_t)OPCode::OP_NONE);
+					break;
+				case Token::Type::T_TRUE:
+					emitByte((uint8_t)OPCode::OP_TRUE);
+					break;
+				case Token::Type::T_FALSE:
+					emitByte((uint8_t)OPCode::OP_FALSE);
+					break;
+			}
+		}
+
 		void parsePrecedence(const Precedence& precendece);
 
 	private:

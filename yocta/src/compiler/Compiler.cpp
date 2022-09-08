@@ -1,3 +1,4 @@
+#include "Debug.h"
 #include "Compiler.h"
 #include "Disassembler.h"
 
@@ -87,7 +88,9 @@ void yo::Compiler::emitConstant(yocta_value value)
 void yo::Compiler::numeric()
 {
 	double value = std::strtod(parser.previous.start, NULL);
-	emitConstant(value);
+
+	Value v{ ValueType::VT_NUMERIC, value };
+	emitConstant(std::get<double>(v.variantValue));
 }
 
 void yo::Compiler::unary()
@@ -100,6 +103,9 @@ void yo::Compiler::unary()
 	{
 	case Token::Type::T_MINUS:
 		emitByte((uint8_t)OPCode::OP_NEGATE);
+		break;
+	case Token::Type::T_EXCLAMATION:
+		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
 	}
 }
@@ -155,9 +161,9 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 void yo::Compiler::intializeParserRules()
 {
 	parseRules.insert({
-				   Token::Type::T_LEFT_PARENTHESIS,
-				   Rule(std::bind(&Compiler::grouping, this), nullptr, Precedence::P_NONE)
-		});
+		Token::Type::T_LEFT_PARENTHESIS,
+		Rule(std::bind(&Compiler::grouping, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_RIGHT_PARENTHESIS,
@@ -211,8 +217,8 @@ void yo::Compiler::intializeParserRules()
 
 	parseRules.insert({
 		Token::Type::T_EXCLAMATION,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(std::bind(&Compiler::unary, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_EXCLAMATION_EQUAL,
@@ -286,13 +292,13 @@ void yo::Compiler::intializeParserRules()
 
 	parseRules.insert({
 		Token::Type::T_FALSE,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_TRUE,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_FOR,
@@ -306,8 +312,8 @@ void yo::Compiler::intializeParserRules()
 
 	parseRules.insert({
 		Token::Type::T_NONE,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_PRINT,

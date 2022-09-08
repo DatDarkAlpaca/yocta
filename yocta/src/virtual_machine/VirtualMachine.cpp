@@ -14,10 +14,10 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 		#ifdef DEBUG_TRACE
 		printf("Stack: %s", vmStack.empty() ? "[]" : "");
 
-		for (const yocta_value& value : vmStack)
+		for (const Value& value : vmStack)
 		{
 			printf("[");
-			printf("%g", value);
+			displayValue(value);
 			printf("]");
 		}
 		printf("\n");
@@ -31,20 +31,21 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 		{
 			case (uint8_t)OPCode::OP_RETURN: 
 			{
-				yocta_value back = vmStack.back();
+				Value back = vmStack.back();
 				vmStack.pop_back();
 
 				#ifdef DEBUG_TRACE
 				printf("\n");
 				#endif
 
-				printf("%g\n", back);
+				displayValue(back);
+				printf("\n");
 				return InterpretResult::OK;
 			}
 
 			case (uint8_t)OPCode::OP_CONSTANT: 
 			{
-				yocta_value constant = readConstant(*chunk);
+				Value constant = readConstant(*chunk);
 				vmStack.push_back(constant);
 				//printf("%g", constant);
 				//printf("\n");
@@ -53,7 +54,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 
 			case (uint8_t)OPCode::OP_NEGATE: 
 			{
-				yocta_value back = vmStack.back();
+				Value back = vmStack.back();
 				vmStack.pop_back();
 				vmStack.push_back(-back);
 				break;
@@ -82,6 +83,33 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				binaryOperation(OPCode::OP_DIV);
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_NOT:
+			{
+				Value back = vmStack.back();
+				vmStack.pop_back();
+
+				vmStack.push_back({ ValueType::VT_BOOL, isBooleanFalse(back) });
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_NONE:
+			{
+				vmStack.push_back({ValueType::VT_NONE, 0.});
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_TRUE:
+			{
+				vmStack.push_back({ ValueType::VT_BOOL, true });
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_FALSE:
+			{
+				vmStack.push_back({ ValueType::VT_BOOL, false });
+				break;
+			}
 		}
 	}
 }
@@ -107,17 +135,17 @@ uint8_t yo::VirtualMachine::readByte()
 	return *IP++;
 }
 
-yo::yocta_value yo::VirtualMachine::readConstant(const Chunk& chunk)
+yo::Value yo::VirtualMachine::readConstant(const Chunk& chunk)
 {
-	return chunk.constantPool[readByte()];
+	return { ValueType::VT_NUMERIC, chunk.constantPool[readByte()] };
 }
 
 void yo::VirtualMachine::binaryOperation(OPCode operation)
 {
-	yocta_value b = vmStack.back();
+	Value b = vmStack.back();
 	vmStack.pop_back();
 
-	yocta_value a = vmStack.back();
+	Value a = vmStack.back();
 	vmStack.pop_back();
 
 	switch (operation)

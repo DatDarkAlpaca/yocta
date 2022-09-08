@@ -6,6 +6,9 @@ namespace yo
 	enum class OPCode : uint8_t
 	{
 		None = 0U,
+		OP_NONE,
+		OP_TRUE,
+		OP_FALSE,
 		OP_RETURN,
 		OP_CONSTANT,
 		OP_NEGATE,
@@ -13,6 +16,7 @@ namespace yo
 		OP_SUB,
 		OP_MULT,
 		OP_DIV,
+		OP_NOT
 	};
 
 	inline const char* translateCode(const OPCode& code)
@@ -21,6 +25,15 @@ namespace yo
 		{
 			case OPCode::None:
 				return "None";
+
+			case OPCode::OP_NONE:
+				return "OP_NONE";
+
+			case OPCode::OP_TRUE:
+				return "OP_TRUE";
+
+			case OPCode::OP_FALSE:
+				return "OP_FALSE";
 
 			case OPCode::OP_RETURN:
 				return "OP_RETURN";
@@ -42,6 +55,9 @@ namespace yo
 
 			case OPCode::OP_DIV:
 				return "OP_DIV";
+
+			case OPCode::OP_NOT:
+				return "OP_NOT";
 		}
 
 		return "";

@@ -16,16 +16,27 @@ namespace yo
 		InterpretResult interpret(const char* source);
 
 	private:
+		const Value& peek(int distance) const
+		{
+			return vmStack.at(- 1 - distance);
+		}
+
 		uint8_t readByte();
 
-		yocta_value readConstant(const Chunk& chunk);
+		Value readConstant(const Chunk& chunk);
 
 	private:
 		void binaryOperation(OPCode operation);
 
 	private:
+		inline bool isBooleanFalse(const Value& value) const
+		{
+			return value.type == ValueType::VT_NONE || (value.type == ValueType::VT_BOOL && !std::get<bool>(value.variantValue));
+		}
+
+	private:
 		const uint8_t* IP = nullptr;
-		std::vector<yocta_value> vmStack;
+		std::vector<Value> vmStack;
 
 	private:
 		Compiler compiler;
