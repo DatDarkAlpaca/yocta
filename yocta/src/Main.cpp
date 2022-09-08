@@ -1,29 +1,78 @@
 #include <cstdio>
+#include <fstream>
+#include <sstream>
 
 #include "VirtualMachine.h"
 #include "OperationCodes.h"
 #include "Disassembler.h"
 #include "Chunk.h"
 
-int main()
+void inlineInterpreter()
 {
-	using namespace yo;
+	yo::VirtualMachine vm;
 
-	Chunk chunk;
-	chunk.push_back((uint8_t)OPCode::OP_CONSTANT, 123);
-	chunk.push_back(10.0, 123);
+	while (true)
+	{
+		printf(">");
 
-	chunk.push_back((uint8_t)OPCode::OP_CONSTANT, 124);
-	chunk.push_back(20.0, 124);
+		char line[1024];
+		if (!fgets(line, sizeof(line), stdin)) 
+		{
+			printf("\n");
+			return;
+		}
 
-	chunk.push_back((uint8_t)OPCode::OP_NEGATE, 125);
+		// interpret(line);
+	}
+}
 
-	chunk.push_back((uint8_t)OPCode::OP_ADD, 125);
+static std::string readFile(const char* filepath)
+{
+	std::ifstream file(filepath);
 
-	chunk.push_back((uint8_t)OPCode::OP_RETURN, 126);
+	if (!file.good())
+	{
+		fprintf(stderr, "An error has occurred while opening the source file.");
+		exit(1);
+	}
 
-	VirtualMachine vm;
-	vm.run(chunk);
+	std::stringstream stringBuffer;
+	stringBuffer << file.rdbuf();
 
+	return stringBuffer.str();
+}
+
+void runFile(const char* filepath)
+{
+	yo::VirtualMachine vm;
+
+	std::string src = readFile(filepath);
+	printf("%s", src.c_str());
+
+	//InterpretResult result = interpret(source);
+	
+
+	/*if (result == INTERPRET_COMPILE_ERROR) 
+		exit(65);
+	if (result == INTERPRET_RUNTIME_ERROR) 
+		exit(70);*/
+
+	//InterpretResult result = interpret(source);
+}
+
+int main(int argc, char** argv)
+{
+	if (argc == 1)
+		inlineInterpreter();
+	
+	else if (argc == 2)
+		runFile(argv[1]);
+
+	else
+	{
+		fprintf(stderr, "Usage: yocta <filepath>\n");
+		return 1;
+	}
+	
 	return 0;
 }

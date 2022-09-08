@@ -3,6 +3,8 @@
 #include "Common.h"
 #include "Disassembler.h"
 
+#include "Compiler.h"
+
 namespace yo
 {
 	class VirtualMachine
@@ -79,6 +81,22 @@ namespace yo
 			}
 		}
 
+		InterpretResult interpret(const char* source)
+		{
+			Chunk chunk;
+
+			if (!compiler.compile(source, &chunk))
+			{
+				chunk.clear();
+				return VirtualMachine::InterpretResult::COMPILE_ERROR;
+			}
+
+			InterpretResult result = run(source);
+
+			chunk.clear();
+			return result;
+		}
+
 	private:
 		uint8_t readByte()
 		{
@@ -122,5 +140,8 @@ namespace yo
 	private:
 		const uint8_t* IP = nullptr;
 		std::vector<yocta_value> vmStack;
+
+	private:
+		Compiler compiler;
 	};
 }

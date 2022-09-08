@@ -44,5 +44,11 @@
     <ClInclude Include="src\Common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Lexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
