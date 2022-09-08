@@ -13,9 +13,10 @@ namespace yo
 		enum class InterpretResult { OK = 0, COMPILE_ERROR, RUNTIME_ERROR };
 
 	public:
-		InterpretResult run(const Chunk& chunk)
+		InterpretResult run()
 		{
-			IP = chunk.data.data();
+			auto chunk = compiler.currentChunk;
+			IP = chunk->data.data();
 
 			while (true)
 			{
@@ -28,7 +29,7 @@ namespace yo
 				}
 				printf("\n");
 
-				Disassembler::disassembleInstruction(chunk, (int)(IP - chunk.data.data()));
+				Disassembler::disassembleInstruction(*compiler.currentChunk, (int)(IP - chunk->data.data()));
 #endif
 
 				uint8_t instruction = 0;
@@ -39,12 +40,12 @@ namespace yo
 						yocta_value back = vmStack.back();
 						vmStack.pop_back();
 
-						printf("%g", back);
+						printf("%g\n", back);
 						return InterpretResult::OK;
 					}
 
 					case (uint8_t)OPCode::OP_CONSTANT: {
-						yocta_value constant = readConstant(chunk);
+						yocta_value constant = readConstant(*chunk);
 						vmStack.push_back(constant);
 						printf("%g", constant);
 						printf("\n");
@@ -91,7 +92,7 @@ namespace yo
 				return VirtualMachine::InterpretResult::COMPILE_ERROR;
 			}
 
-			InterpretResult result = run(source);
+			InterpretResult result = run();
 
 			chunk.clear();
 			return result;

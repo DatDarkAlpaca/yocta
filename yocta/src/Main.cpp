@@ -22,7 +22,7 @@ void inlineInterpreter()
 			return;
 		}
 
-		// interpret(line);
+		vm.interpret(line);
 	}
 }
 

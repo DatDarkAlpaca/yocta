@@ -19,7 +19,7 @@ namespace yo
 			lines.push_back(lineNumber);
 		}
 
-		void push_back(yocta_value constant, int lineNumber)
+		void push_constant(yocta_value constant, int lineNumber)
 		{
 			constantPool.push_back(constant);
 			size_t index = constantPool.size() - 1;

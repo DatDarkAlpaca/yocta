@@ -54,9 +54,8 @@ unsigned int yo::Disassembler::simpleInstruction(uint8_t code, int offset)
 
 unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& chunk, int offset)
 {
-	int off = ++offset;
-	uint8_t constant = chunk.data[off];
+	uint8_t constant = chunk.data[++offset];
 	printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, chunk.constantPool[constant]);
 
-	return offset + 2;
+	return offset + 1;
 }

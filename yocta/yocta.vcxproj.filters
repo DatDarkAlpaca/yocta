@@ -24,6 +24,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
+    <None Include="main.yo" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Chunk.h">

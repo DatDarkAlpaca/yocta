@@ -28,8 +28,6 @@ namespace yo
 	public:
 		enum class Type
 		{
-			T_NONE = 0,
-
 			// Literals:
 			T_IDENTIFIER,
 			T_STRING,
@@ -65,6 +63,8 @@ namespace yo
 		{
 
 		}
+
+		Token() = default;
 
 	public:
 		Type type;
