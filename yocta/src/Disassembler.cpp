@@ -3,10 +3,12 @@
 
 void yo::Disassembler::disassemble(const Chunk& array, const char* instructionSetName)
 {
-	printf("-=-= Operations : %s =-=-\n", instructionSetName);
+	printf("-=-= Disassembly : %s =-=-\n", instructionSetName);
 
 	for (unsigned int offset = 0; offset < array.data.size();)
 		offset = disassembleInstruction(array, offset);
+
+	printf("\n");
 }
 
 unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int offset)

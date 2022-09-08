@@ -15,12 +15,18 @@ namespace yo
 	public:
 		InterpretResult run()
 		{
+#ifdef DEBUG_TRACE
+			printf("-=-= Disassembly : Interpreter =-=-\n");
+#endif
+
 			auto chunk = compiler.currentChunk;
 			IP = chunk->data.data();
 
 			while (true)
 			{
 #ifdef DEBUG_TRACE
+				printf("Stack: %s", vmStack.empty() ? "[]" : "");
+
 				for (const yocta_value& value : vmStack)
 				{
 					printf("[");
@@ -40,6 +46,10 @@ namespace yo
 						yocta_value back = vmStack.back();
 						vmStack.pop_back();
 
+#ifdef DEBUG_TRACE
+						printf("\n");
+#endif
+
 						printf("%g\n", back);
 						return InterpretResult::OK;
 					}
@@ -47,8 +57,8 @@ namespace yo
 					case (uint8_t)OPCode::OP_CONSTANT: {
 						yocta_value constant = readConstant(*chunk);
 						vmStack.push_back(constant);
-						printf("%g", constant);
-						printf("\n");
+						//printf("%g", constant);
+						//printf("\n");
 						break;
 					}
 
