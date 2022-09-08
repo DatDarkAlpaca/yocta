@@ -152,7 +152,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Disassembler.cpp" />
-    <ClCompile Include="src\InstructionArray.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -160,7 +159,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Disassembler.h" />
-    <ClInclude Include="src\InstructionArray.h" />
+    <ClInclude Include="src\Chunk.h" />
+    <ClInclude Include="src\OperationCodes.h" />
+    <ClInclude Include="src\Value.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

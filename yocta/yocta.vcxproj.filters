@@ -18,9 +18,6 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\InstructionArray.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Disassembler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -29,10 +26,16 @@
     <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\InstructionArray.h">
+    <ClInclude Include="src\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Disassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Value.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\OperationCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

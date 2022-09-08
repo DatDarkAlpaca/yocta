@@ -1,21 +1,21 @@
-#include "InstructionArray.h"
+#include <cstdio>
+
+#include "Chunk.h"
 #include "Disassembler.h"
+
+#include "OperationCodes.h"
 
 int main()
 {
 	using namespace yo;
 
-	InstructionArray instructionArray(8);
-	instructionArray.push_back((uint8_t)OPCode::OP_RETURN);
+	Chunk chunk;
+	chunk.push_back((uint8_t)OPCode::OP_CONSTANT);
+	chunk.push_back(10.0);
+	chunk.push_back((uint8_t)OPCode::OP_RETURN);
 
 	Disassembler disassembler;
-
-	disassembler(instructionArray, "Instruction Array: Before");
-
-	instructionArray.clear();
-	printf("\n");
-
-	disassembler(instructionArray, "Instruction Array: After");
+	disassembler(chunk, "Disassembly");
 
 	return 0;
 }

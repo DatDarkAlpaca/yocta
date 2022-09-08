@@ -1,18 +1,20 @@
 #pragma once
-#include "InstructionArray.h"
+#include "Chunk.h"
 
 namespace yo
 {
 	class Disassembler
 	{
 	public:
-		void operator()(const InstructionArray& array, const char* instructionSetName);
+		void operator()(const Chunk& array, const char* instructionSetName);
 
 	private:
-		unsigned int disassembleInstruction(const InstructionArray& array, int offset);
+		unsigned int disassembleInstruction(const Chunk& array, int offset);
 
 	private:
-		unsigned int simpleInstruction(const char* name, int offset);
+		unsigned int simpleInstruction(uint8_t code, int offset);
+
+		unsigned int constantInstruction(uint8_t code, const Chunk& chunk, int offset);
 	};
 }
 
