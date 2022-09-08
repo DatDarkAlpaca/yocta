@@ -3,9 +3,6 @@
 #include <sstream>
 
 #include "VirtualMachine.h"
-#include "OperationCodes.h"
-#include "Disassembler.h"
-#include "Chunk.h"
 
 void inlineInterpreter()
 {

@@ -18,7 +18,19 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Disassembler.cpp">
+    <ClCompile Include="src\disassembler\Disassembler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\common\chunk\Chunk.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compiler\Compiler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\lexer\Lexer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\virtual_machine\VirtualMachine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -27,28 +39,43 @@
     <None Include="main.yo" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Chunk.h">
+    <ClInclude Include="src\common\chunk\Chunk.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Disassembler.h">
+    <ClInclude Include="src\disassembler\Disassembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Value.h">
+    <ClInclude Include="src\common\Value.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\OperationCodes.h">
+    <ClInclude Include="src\common\OperationCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\VirtualMachine.h">
+    <ClInclude Include="src\virtual_machine\VirtualMachine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Common.h">
+    <ClInclude Include="src\common\StringHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Compiler.h">
+    <ClInclude Include="src\compiler\Compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Lexer.h">
+    <ClInclude Include="src\lexer\Lexer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lexer\Token.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compiler\Parser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compiler\Precedence.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compiler\Rule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

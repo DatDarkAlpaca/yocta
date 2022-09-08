@@ -73,22 +73,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)src;$(IncludePath)</IncludePath>
+    <IncludePath>$(ProjectDir)src/common/chunk;$(ProjectDir)src/common;$(ProjectDir)src/disassembler;$(ProjectDir)src/virtual_machine;$(ProjectDir)src/lexer;$(ProjectDir)src/compiler;$(ProjectDir)src;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectDir)src/common/chunk;$(ProjectDir)src/common;$(ProjectDir)src/disassembler;$(ProjectDir)src/virtual_machine;$(ProjectDir)src/lexer;$(ProjectDir)src/compiler;$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectDir)src/common/chunk;$(ProjectDir)src/common;$(ProjectDir)src/disassembler;$(ProjectDir)src/virtual_machine;$(ProjectDir)src/lexer;$(ProjectDir)src/compiler;$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(Configuration)-$(Platform)\$(ProjectName)\</OutDir>
     <IntDir>$(SolutionDir)intermediate\$(Configuration)-$(Platform)\$(ProjectName)\</IntDir>
-    <IncludePath>$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <IncludePath>$(ProjectDir)src/common/chunk;$(ProjectDir)src/common;$(ProjectDir)src/disassembler;$(ProjectDir)src/virtual_machine;$(ProjectDir)src/lexer;$(ProjectDir)src/compiler;$(ProjectDir)src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,22 +151,31 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\Disassembler.cpp" />
+    <ClCompile Include="src\common\chunk\Chunk.cpp" />
+    <ClCompile Include="src\compiler\Compiler.cpp" />
+    <ClCompile Include="src\disassembler\Disassembler.cpp" />
+    <ClCompile Include="src\lexer\Lexer.cpp" />
     <ClCompile Include="src\Main.cpp" />
+    <ClCompile Include="src\virtual_machine\VirtualMachine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
     <None Include="main.yo" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Common.h" />
-    <ClInclude Include="src\Compiler.h" />
-    <ClInclude Include="src\Disassembler.h" />
-    <ClInclude Include="src\Chunk.h" />
-    <ClInclude Include="src\Lexer.h" />
-    <ClInclude Include="src\OperationCodes.h" />
-    <ClInclude Include="src\Value.h" />
-    <ClInclude Include="src\VirtualMachine.h" />
+    <ClInclude Include="src\common\StringHelper.h" />
+    <ClInclude Include="src\common\Debug.h" />
+    <ClInclude Include="src\compiler\Compiler.h" />
+    <ClInclude Include="src\disassembler\Disassembler.h" />
+    <ClInclude Include="src\common\chunk\Chunk.h" />
+    <ClInclude Include="src\lexer\Lexer.h" />
+    <ClInclude Include="src\common\OperationCodes.h" />
+    <ClInclude Include="src\compiler\Parser.h" />
+    <ClInclude Include="src\compiler\Precedence.h" />
+    <ClInclude Include="src\compiler\Rule.h" />
+    <ClInclude Include="src\lexer\Token.h" />
+    <ClInclude Include="src\common\Value.h" />
+    <ClInclude Include="src\virtual_machine\VirtualMachine.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
