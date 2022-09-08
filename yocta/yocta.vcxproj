@@ -151,14 +151,16 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Disassembler.cpp" />
+    <ClCompile Include="src\InstructionArray.cpp" />
     <ClCompile Include="src\Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Lexer.h" />
-    <ClInclude Include="src\Token.h" />
+    <ClInclude Include="src\Disassembler.h" />
+    <ClInclude Include="src\InstructionArray.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

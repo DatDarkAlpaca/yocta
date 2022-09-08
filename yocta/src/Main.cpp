@@ -1,19 +1,21 @@
-#include <iostream>
-#include <string>
-#include "Lexer.h"
+#include "InstructionArray.h"
+#include "Disassembler.h"
 
 int main()
 {
-	std::string input;
-	std::getline(std::cin, input);
+	using namespace yo;
 
-	auto tokens = yo::lex(input);
-	std::cout << "Tokens: " << tokens.size() << '\n';
+	InstructionArray instructionArray(8);
+	instructionArray.push_back((uint8_t)OPCode::OP_RETURN);
 
-	for (const auto& token : tokens)
-	{
-		std::cout << "- Text: " << token.text << " | ";
-		std::cout << "- Type: " << (int)token.type << " | ";
-		std::cout << "- Start: " << token.startPosition << "\n";
-	}
+	Disassembler disassembler;
+
+	disassembler(instructionArray, "Instruction Array: Before");
+
+	instructionArray.clear();
+	printf("\n");
+
+	disassembler(instructionArray, "Instruction Array: After");
+
+	return 0;
 }
