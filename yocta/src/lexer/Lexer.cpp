@@ -51,8 +51,13 @@ yo::Token yo::Lexer::scanToken()
 		case '/': return createToken(Token::Type::T_SLASH);
 
 		case '!':
-			return createToken(matches(current, '=')
+		{
+			auto token = createToken(matches(current, '=')
 				? Token::Type::T_EXCLAMATION_EQUAL : Token::Type::T_EXCLAMATION);
+			if (token.type == Token::Type::T_EXCLAMATION_EQUAL)
+				current++;
+			return token;
+		}
 
 		case '=':
 		{
