@@ -82,8 +82,7 @@ unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& ch
 	Value value = chunk.constantPool[constant];
 	if (value.variantValue.index() == 2)
 	{
-		const char* str = getObjectString(value).c_str();
-		printf("%s\t[Index]: %d | [Value]: %s\n", translateCode((OPCode)code), constant, str);
+		printf("%s\t[Index]: %d | [Value]: STRING\n", translateCode((OPCode)code), constant);
 	}
 	else
 		printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, value);
