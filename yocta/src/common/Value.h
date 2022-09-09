@@ -10,7 +10,7 @@ namespace yo
 		VT_NUMERIC
 	};
 
-	using yocta_value = double;
+	using YoctaValue = double;
 
 	struct Value
 	{

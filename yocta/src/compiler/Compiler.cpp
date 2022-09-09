@@ -79,7 +79,7 @@ void yo::Compiler::emitByte(uint8_t byte)
 	currentChunk->push_back(byte, parser.previous.line);
 }
 
-void yo::Compiler::emitConstant(yocta_value value)
+void yo::Compiler::emitConstant(YoctaValue value)
 {
 	emitByte((uint8_t)OPCode::OP_CONSTANT);
 	currentChunk->push_constant(value, parser.previous.line);

@@ -32,7 +32,7 @@ namespace yo
 	private:
 		void emitByte(uint8_t byte);
 
-		void emitConstant(yocta_value value);
+		void emitConstant(YoctaValue value);
 
 	private:
 		void numeric();
