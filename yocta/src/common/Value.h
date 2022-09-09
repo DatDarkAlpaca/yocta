@@ -81,11 +81,25 @@ namespace yo
 
 	inline const Value& operator+(const Value& lhs, const Value& rhs)
 	{
-		double a = std::get<double>(lhs.variantValue);
-		double b = std::get<double>(rhs.variantValue);
+		if (lhs.type != rhs.type)
+			return {};
 
-		std::variant<bool, double, YoctaObject*>v(a + b);
-		return { lhs.type, v };
+		if (lhs.variantValue.index() == 1)
+		{
+			double a = std::get<double>(lhs.variantValue);
+			double b = std::get<double>(rhs.variantValue);
+
+			std::variant<bool, double, YoctaObject*>v(a + b);
+			return { lhs.type, v };
+		}
+		else if (lhs.variantValue.index() == 2)
+		{
+			std::string a = getObjectString(lhs);
+			std::string b = getObjectString(rhs);
+
+			std::variant<bool, double, YoctaObject*>v((YoctaObject*)(new StringObject(a + b)));
+			return { lhs.type, v };
+		}
 	}
 
 	inline const Value& operator-(const Value& lhs, const Value& rhs)

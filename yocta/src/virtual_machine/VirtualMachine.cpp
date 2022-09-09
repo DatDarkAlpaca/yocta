@@ -167,9 +167,11 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 {
 	Value b = vmStack.back();
 	vmStack.pop_back();
+	auto b1 = getObjectString(b);
 
 	Value a = vmStack.back();
 	vmStack.pop_back();
+	auto b2 = getObjectString(a);
 
 	switch (operation)
 	{

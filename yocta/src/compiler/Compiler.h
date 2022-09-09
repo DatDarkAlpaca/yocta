@@ -61,8 +61,7 @@ namespace yo
 		void string()
 		{
 			std::string str = parser.previous.start + 1;
-			str = str.erase(str.length() - 2).c_str();
-			
+			str = str.erase(parser.previous.length - 2).c_str();
 			emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(new StringObject(str))});
 		}
 
