@@ -110,6 +110,29 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				vmStack.push_back({ ValueType::VT_BOOL, false });
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_EQUAL:
+			{
+				Value b = vmStack.back();
+				vmStack.pop_back();
+
+				Value a = vmStack.back();
+				vmStack.pop_back();
+
+				vmStack.push_back({ ValueType::VT_BOOL, a == b });
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_GREATER:
+			{
+				binaryOperation(OPCode::OP_GREATER);
+				break;
+			}
+			case (uint8_t)OPCode::OP_LESS:
+			{
+				binaryOperation(OPCode::OP_LESS);
+				break;
+			}
 		}
 	}
 }
@@ -164,6 +187,14 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 
 	case OPCode::OP_DIV:
 		vmStack.push_back(a / b);
+		break;
+
+	case OPCode::OP_GREATER:
+		vmStack.push_back({ ValueType::VT_BOOL, a > b });
+		break;
+
+	case OPCode::OP_LESS:
+		vmStack.push_back({ ValueType::VT_BOOL, a < b });
 		break;
 	}
 }

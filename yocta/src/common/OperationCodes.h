@@ -16,7 +16,10 @@ namespace yo
 		OP_SUB,
 		OP_MULT,
 		OP_DIV,
-		OP_NOT
+		OP_NOT,
+		OP_EQUAL,
+		OP_LESS,
+		OP_GREATER
 	};
 
 	inline const char* translateCode(const OPCode& code)
@@ -58,6 +61,15 @@ namespace yo
 
 			case OPCode::OP_NOT:
 				return "OP_NOT";
+
+			case OPCode::OP_EQUAL:
+				return "OP_EQUAL";
+
+			case OPCode::OP_LESS:
+				return "OP_LESS";	
+			
+			case OPCode::OP_GREATER:
+				return "OP_GREATER";
 		}
 
 		return "";

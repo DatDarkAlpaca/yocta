@@ -132,6 +132,29 @@ void yo::Compiler::binary()
 	case Token::Type::T_SLASH:
 		emitByte((uint8_t)OPCode::OP_DIV);
 		break;
+		
+	case Token::Type::T_EQUAL_EQUAL:
+		emitByte((uint8_t)OPCode::OP_EQUAL);
+		break;
+	case Token::Type::T_EXCLAMATION_EQUAL:
+		emitByte((uint8_t)OPCode::OP_EQUAL);
+		emitByte((uint8_t)OPCode::OP_NOT);
+		break;
+	case Token::Type::T_GREATER:
+		emitByte((uint8_t)OPCode::OP_GREATER);
+		break;
+	case Token::Type::T_GREATER_EQUAL:
+		emitByte((uint8_t)OPCode::OP_LESS);
+		emitByte((uint8_t)OPCode::OP_NOT);
+		break;
+	case Token::Type::T_LESS:
+		emitByte((uint8_t)OPCode::OP_LESS);
+		break;
+	case Token::Type::T_LESS_EQUAL:
+		emitByte((uint8_t)OPCode::OP_GREATER);
+		emitByte((uint8_t)OPCode::OP_NOT);
+		break;
+
 	}
 }
 
@@ -193,12 +216,12 @@ void yo::Compiler::intializeParserRules()
 	parseRules.insert({
 		Token::Type::T_MINUS,
 		Rule(std::bind(&Compiler::unary, this), std::bind(&Compiler::binary, this), Precedence::P_TERM)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_PLUS,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_TERM)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_SLASH,
@@ -208,7 +231,7 @@ void yo::Compiler::intializeParserRules()
 	parseRules.insert({
 		Token::Type::T_ASTERISTIC,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_FACTOR)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_SEMICOLON,
@@ -222,38 +245,38 @@ void yo::Compiler::intializeParserRules()
 
 	parseRules.insert({
 		Token::Type::T_EXCLAMATION_EQUAL,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_EQUAL)
+	});
 
 	parseRules.insert({
 		Token::Type::T_EQUAL,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_EQUAL_EQUAL,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_GREATER,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_GREATER_EQUAL,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_LESS,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_LESS_EQUAL,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_IDENTIFIER,

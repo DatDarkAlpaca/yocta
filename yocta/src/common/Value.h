@@ -28,6 +28,12 @@ namespace yo
 		friend const Value& operator*(const Value& lhs, const Value& rhs);
 
 		friend const Value& operator/(const Value& lhs, const Value& rhs);
+
+		friend const bool operator==(const Value& lhs, const Value& rhs);
+
+		friend const bool operator<(const Value& lhs, const Value& rhs);
+
+		friend const bool operator>(const Value& lhs, const Value& rhs);
 	};
 
 	inline void displayValue(const Value& value)
@@ -45,38 +51,109 @@ namespace yo
 	inline const Value& operator-(const Value& lhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		return { lhs.type, std::variant<bool, double>(-a) };
+		std::variant<bool, double> v(-a);
+		return { lhs.type, v };
 	}
 
 	inline const Value& operator+(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		double b = std::get<double>(lhs.variantValue);
+		double b = std::get<double>(rhs.variantValue);
 
-		return { lhs.type, std::variant<bool, double>(a + b) };
+		std::variant<bool, double> v(a + b);
+		return { lhs.type, v };
 	}
 
 	inline const Value& operator-(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		double b = std::get<double>(lhs.variantValue);
+		double b = std::get<double>(rhs.variantValue);
 
-		return { lhs.type, std::variant<bool, double>(a - b) };
+		std::variant<bool, double> v(a - b);
+		return { lhs.type, v };
 	}
 
 	inline const Value& operator*(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		double b = std::get<double>(lhs.variantValue);
+		double b = std::get<double>(rhs.variantValue);
 
-		return { lhs.type, std::variant<bool, double>(a * b) };
+		std::variant<bool, double> v(a * b);
+		return { lhs.type, v };
 	}
 
 	inline const Value& operator/(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		double b = std::get<double>(lhs.variantValue);
+		double b = std::get<double>(rhs.variantValue);
 
-		return { lhs.type, std::variant<bool, double>(a / b) };
+		std::variant<bool, double> v(a / b);
+		return { lhs.type, v };
+	}
+
+	inline const bool operator==(const Value& lhs, const Value& rhs)
+	{
+		if (lhs.type != rhs.type)
+			return false;
+
+		if (lhs.type == ValueType::VT_NONE)
+			return (rhs.type == ValueType::VT_NONE);
+			
+		if (lhs.variantValue.index() == 0)
+		{
+			bool a = std::get<bool>(lhs.variantValue);
+			bool b = std::get<bool>(rhs.variantValue);
+			return a == b;
+		}
+		else if (lhs.variantValue.index() == 1)
+		{
+			double a = std::get<double>(lhs.variantValue);
+			double b = std::get<double>(rhs.variantValue);
+			return a == b;
+		}
+	}
+
+	inline const bool operator<(const Value& lhs, const Value& rhs)
+	{
+		if (lhs.type != rhs.type)
+			return false;
+
+		if (lhs.type == ValueType::VT_NONE)
+			return true;
+
+		if (lhs.variantValue.index() == 0)
+		{
+			bool a = std::get<bool>(lhs.variantValue);
+			bool b = std::get<bool>(rhs.variantValue);
+			return a < b;
+		}
+		else if (lhs.variantValue.index() == 1)
+		{
+			double a = std::get<double>(lhs.variantValue);
+			double b = std::get<double>(rhs.variantValue);
+			return a < b;
+		}
+	}
+
+	inline const bool operator>(const Value& lhs, const Value& rhs)
+	{
+		if (lhs.type != rhs.type)
+			return false;
+
+		if (lhs.type == ValueType::VT_NONE)
+			return true;
+
+		if (lhs.variantValue.index() == 0)
+		{
+			bool a = std::get<bool>(lhs.variantValue);
+			bool b = std::get<bool>(rhs.variantValue);
+			return a > b;
+		}
+		else if (lhs.variantValue.index() == 1)
+		{
+			double a = std::get<double>(lhs.variantValue);
+			double b = std::get<double>(rhs.variantValue);
+			return a > b;
+		}
 	}
 }

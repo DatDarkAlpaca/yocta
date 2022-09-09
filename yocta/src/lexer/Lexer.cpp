@@ -25,6 +25,7 @@ yo::Token yo::Lexer::scanToken()
 		return createToken(Token::Type::T_EOF);
 
 	char character = advance();
+
 	if (std::isdigit(character))
 		return handleNumeric();
 
@@ -33,40 +34,55 @@ yo::Token yo::Lexer::scanToken()
 
 	switch (character)
 	{
-	case '(': return createToken(Token::Type::T_LEFT_PARENTHESIS);
-	case ')': return createToken(Token::Type::T_RIGHT_PARENTHESIS);
-	case '[': return createToken(Token::Type::T_LEFT_BRACKETS);
-	case ']': return createToken(Token::Type::T_RIGHT_BRACKETS);
-	case '{': return createToken(Token::Type::T_LEFT_BRACES);
-	case '}': return createToken(Token::Type::T_RIGHT_BRACES);
+		case '(': return createToken(Token::Type::T_LEFT_PARENTHESIS);
+		case ')': return createToken(Token::Type::T_RIGHT_PARENTHESIS);
+		case '[': return createToken(Token::Type::T_LEFT_BRACKETS);
+		case ']': return createToken(Token::Type::T_RIGHT_BRACKETS);
+		case '{': return createToken(Token::Type::T_LEFT_BRACES);
+		case '}': return createToken(Token::Type::T_RIGHT_BRACES);
 
-	case ';': return createToken(Token::Type::T_SEMICOLON);
-	case '.': return createToken(Token::Type::T_DOT);
-	case ',': return createToken(Token::Type::T_COMMA);
+		case ';': return createToken(Token::Type::T_SEMICOLON);
+		case '.': return createToken(Token::Type::T_DOT);
+		case ',': return createToken(Token::Type::T_COMMA);
 
-	case '+': return createToken(Token::Type::T_PLUS);
-	case '-': return createToken(Token::Type::T_MINUS);
-	case '*': return createToken(Token::Type::T_ASTERISTIC);
-	case '/': return createToken(Token::Type::T_SLASH);
+		case '+': return createToken(Token::Type::T_PLUS);
+		case '-': return createToken(Token::Type::T_MINUS);
+		case '*': return createToken(Token::Type::T_ASTERISTIC);
+		case '/': return createToken(Token::Type::T_SLASH);
 
-	case '!':
-		return createToken(matches(current, '=')
-			? Token::Type::T_EXCLAMATION_EQUAL : Token::Type::T_EXCLAMATION);
+		case '!':
+			return createToken(matches(current, '=')
+				? Token::Type::T_EXCLAMATION_EQUAL : Token::Type::T_EXCLAMATION);
 
-	case '=':
-		return createToken(matches(current, '=')
-			? Token::Type::T_EQUAL_EQUAL : Token::Type::T_EQUAL);
+		case '=':
+		{
+			auto token = createToken(matches(current, '=')
+				? Token::Type::T_EQUAL_EQUAL : Token::Type::T_EQUAL);
+			if (token.type == Token::Type::T_EQUAL_EQUAL)
+				current++;
+			return token;
+		}
+		
+		case '<':
+		{
+			auto token = createToken(matches(current, '=')
+				? Token::Type::T_LESS_EQUAL : Token::Type::T_LESS);
+			if(token.type == Token::Type::T_LESS_EQUAL)
+				current++;
+			return token;
+		}
+			
+		case '>':
+		{
+			auto token = createToken(matches(current, '=')
+				? Token::Type::T_GREATER_EQUAL : Token::Type::T_GREATER);
+			if (token.type == Token::Type::T_GREATER_EQUAL)
+				current++;
+			return token;
+		}
 
-	case '<':
-		return createToken(matches(current, '=')
-			? Token::Type::T_LESS_EQUAL : Token::Type::T_LESS);
-
-	case '>':
-		return createToken(matches(current, '=')
-			? Token::Type::T_GREATER_EQUAL : Token::Type::T_GREATER);
-
-	case '"':
-		return handleString();
+		case '"':
+			return handleString();
 	}
 
 	return createErrorToken("Unexpected token");
@@ -169,9 +185,9 @@ yo::Token::Type yo::Lexer::getIdentifierType() const
 			{
 				switch (start[1])
 				{
-				case 'a': return checkWordEnd(2, 3, "lse", Token::Type::T_FALSE);
-				case 'o': return checkWordEnd(2, 1, "r", Token::Type::T_FOR);
-				case 'u': return checkWordEnd(2, 1, "n", Token::Type::T_FUN);
+					case 'a': return checkWordEnd(2, 3, "lse", Token::Type::T_FALSE);
+					case 'o': return checkWordEnd(2, 1, "r", Token::Type::T_FOR);
+					case 'u': return checkWordEnd(2, 1, "n", Token::Type::T_FUN);
 				}
 			}
 		break;
