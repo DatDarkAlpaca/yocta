@@ -48,8 +48,6 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 			{
 				Value constant = readConstant(*chunk);
 				vmStack.push_back(constant);
-				//printf("%g", constant);
-				//printf("\n");
 				break;
 			}
 
