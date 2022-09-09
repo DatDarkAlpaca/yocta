@@ -7,7 +7,6 @@ yo::Compiler::Compiler()
 	intializeParserRules();
 }
 
-// TODO: return a chunk rather than receiving a chunk pointer.
 bool yo::Compiler::compile(const char* source, Chunk* chunk)
 {
 	lexer.open(source);
@@ -18,9 +17,8 @@ bool yo::Compiler::compile(const char* source, Chunk* chunk)
 
 	advance();
 
-	expression();
-
-	eat(Token::Type::T_EOF, "Expected end of expression.");
+	while (!matchToken(Token::Type::T_EOF))
+		declaration();
 
 	finish();
 

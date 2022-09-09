@@ -22,6 +22,19 @@ namespace yo
 	private:
 		void advance();
 
+		void declaration()
+		{
+			statement();
+		}
+
+		void statement()
+		{
+			if (matchToken(Token::Type::T_PRINT))
+				statementPrint();
+			else
+				statementExpression();
+		}
+
 		void expression();
 
 		void eat(Token::Type type, const char* message);
@@ -29,6 +42,42 @@ namespace yo
 		void finish();
 
 		void grouping();
+
+	private:
+		void statementExpression()
+		{
+			expression();
+
+			eat(Token::Type::T_SEMICOLON, "Expected ';' after expression.");
+
+			emitByte((uint8_t)OPCode::OP_POP_BACK);
+		}
+
+		void statementPrint()
+		{
+			expression();
+
+			eat(Token::Type::T_SEMICOLON, "Expected ';' after expression.");
+
+			emitByte((uint8_t)OPCode::OP_PRINT);
+		}
+
+	private:
+		void synchronize()
+		{
+			parser.panicMode = false;
+
+			while (parser.current.type != Token::Type::T_EOF)
+			{
+				if (parser.previous.type == Token::Type::T_SEMICOLON)
+					return;
+
+				/*switch (parser.current.type)
+				{
+					case
+				}*/
+			}
+		}
 
 	private:
 		void emitByte(uint8_t byte);
@@ -62,6 +111,17 @@ namespace yo
 		void handleErrorAtCurrentToken(const char* message);
 
 		void handleErrorToken(Token* token, const char* message);
+
+	private:
+		bool matchToken(Token::Type type)
+		{
+			if (parser.current.type != type)
+				return false;
+
+			advance();
+
+			return true;
+		}
 
 	public:
 		Lexer lexer;

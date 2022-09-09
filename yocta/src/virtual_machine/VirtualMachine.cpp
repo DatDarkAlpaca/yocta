@@ -31,18 +31,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 		switch (instruction = readByte())
 		{
 			case (uint8_t)OPCode::OP_RETURN: 
-			{
-				Value back = vmStack.back();
-				vmStack.pop_back();
-
-				#ifdef DEBUG_TRACE
-				printf("\n");
-				#endif
-
-				displayValue(back);
-				printf("\n");
 				return InterpretResult::OK;
-			}
 
 			case (uint8_t)OPCode::OP_CONSTANT: 
 			{
@@ -132,6 +121,20 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				binaryOperation(OPCode::OP_LESS);
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_PRINT:
+			{
+				Value back = vmStack.back();
+				vmStack.pop_back();
+
+				displayValue(back);
+				printf("\n");
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_POP_BACK:
+				vmStack.pop_back();
+				break;
 		}
 	}
 }
@@ -166,11 +169,9 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 {
 	Value b = vmStack.back();
 	vmStack.pop_back();
-	auto b1 = getObjectString(b);
 
 	Value a = vmStack.back();
 	vmStack.pop_back();
-	auto b2 = getObjectString(a);
 
 	switch (operation)
 	{

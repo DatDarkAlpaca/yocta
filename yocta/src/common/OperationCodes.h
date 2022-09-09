@@ -19,7 +19,9 @@ namespace yo
 		OP_NOT,
 		OP_EQUAL,
 		OP_LESS,
-		OP_GREATER
+		OP_GREATER,
+		OP_PRINT,
+		OP_POP_BACK
 	};
 
 	inline const char* translateCode(const OPCode& code)
@@ -70,6 +72,12 @@ namespace yo
 			
 			case OPCode::OP_GREATER:
 				return "OP_GREATER";
+
+			case OPCode::OP_PRINT:
+				return "OP_PRINT";
+
+			case OPCode::OP_POP_BACK:
+				return "OP_POP_BACK"; 
 		}
 
 		return "";
