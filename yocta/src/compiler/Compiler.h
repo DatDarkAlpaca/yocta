@@ -7,6 +7,7 @@
 #include "Lexer.h"
 #include "Chunk.h"
 #include "Rule.h"
+#include "YoctaObject.h"
 
 namespace yo
 {
@@ -32,7 +33,7 @@ namespace yo
 	private:
 		void emitByte(uint8_t byte);
 
-		void emitConstant(YoctaValue value);
+		void emitConstant(Value value);
 
 	private:
 		void numeric();
@@ -55,6 +56,14 @@ namespace yo
 					emitByte((uint8_t)OPCode::OP_FALSE);
 					break;
 			}
+		}
+
+		void string()
+		{
+			std::string str = parser.previous.start + 1;
+			str = str.erase(str.length() - 2).c_str();
+			
+			emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(new StringObject(str))});
 		}
 
 		void parsePrecedence(const Precedence& precendece);

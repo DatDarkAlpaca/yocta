@@ -1,5 +1,7 @@
 #pragma once
 #include <variant>
+#include "Value.h"
+#include "YoctaObject.h"
 
 namespace yo
 {
@@ -7,16 +9,20 @@ namespace yo
 	{
 		VT_NONE,
 		VT_BOOL,
-		VT_NUMERIC
+		VT_NUMERIC,
+		VT_OBJECT
 	};
 
 	using YoctaValue = double;
 
+	struct YoctaObject;
+	struct StringObject;
+	
 	struct Value
 	{
 	public:
 		ValueType type;
-		std::variant<bool, double> variantValue;
+		std::variant<bool, double, YoctaObject*> variantValue;
 
 	public:
 		friend const Value& operator-(const Value& lhs);
@@ -36,6 +42,12 @@ namespace yo
 		friend const bool operator>(const Value& lhs, const Value& rhs);
 	};
 
+	inline std::string getObjectString(const Value& value)
+	{
+		std::string str = ((StringObject*)(std::get<YoctaObject*>(value.variantValue)))->data;
+		return str.c_str();
+	}
+
 	inline void displayValue(const Value& value)
 	{
 		if(value.type == ValueType::VT_NONE)
@@ -46,12 +58,24 @@ namespace yo
 
 		else if (value.type == ValueType::VT_NUMERIC)
 			printf("%f", std::get<double>(value.variantValue));
+
+		else if (value.type == ValueType::VT_OBJECT)
+		{
+			auto str = getObjectString(value);
+
+			switch (std::get<YoctaObject*>(value.variantValue)->type)
+			{
+				case ObjectType::STRING:
+					printf("%s", str.c_str());
+					break;
+			}
+		}
 	}
 
 	inline const Value& operator-(const Value& lhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		std::variant<bool, double> v(-a);
+		std::variant<bool, double, YoctaObject*> v(-a);
 		return { lhs.type, v };
 	}
 
@@ -60,7 +84,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double> v(a + b);
+		std::variant<bool, double, YoctaObject*>v(a + b);
 		return { lhs.type, v };
 	}
 
@@ -69,7 +93,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double> v(a - b);
+		std::variant<bool, double, YoctaObject*> v(a - b);
 		return { lhs.type, v };
 	}
 
@@ -78,7 +102,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double> v(a * b);
+		std::variant<bool, double, YoctaObject*> v(a * b);
 		return { lhs.type, v };
 	}
 
@@ -87,7 +111,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double> v(a / b);
+		std::variant<bool, double, YoctaObject*> v(a / b);
 		return { lhs.type, v };
 	}
 

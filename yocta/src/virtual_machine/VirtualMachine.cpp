@@ -160,7 +160,7 @@ uint8_t yo::VirtualMachine::readByte()
 
 yo::Value yo::VirtualMachine::readConstant(const Chunk& chunk)
 {
-	return { ValueType::VT_NUMERIC, chunk.constantPool[readByte()] };
+	return chunk.constantPool[readByte()];
 }
 
 void yo::VirtualMachine::binaryOperation(OPCode operation)

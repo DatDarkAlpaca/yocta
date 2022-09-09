@@ -15,13 +15,13 @@ namespace yo
 	public:
 		void push_back(uint8_t opcode, int lineNumber);
 
-		void push_constant(YoctaValue constant, int lineNumber);
+		void push_constant(Value value, int lineNumber);
 
 		void clear();
 
 	public:
 		std::vector<int> lines;
 		std::vector<uint8_t> data;
-		std::vector<YoctaValue> constantPool;
+		std::vector<Value> constantPool;
 	};
 }

@@ -169,6 +169,7 @@
   <ItemGroup>
     <ClInclude Include="src\common\StringHelper.h" />
     <ClInclude Include="src\common\Debug.h" />
+    <ClInclude Include="src\common\YoctaObject.h" />
     <ClInclude Include="src\compiler\Compiler.h" />
     <ClInclude Include="src\disassembler\Disassembler.h" />
     <ClInclude Include="src\common\chunk\Chunk.h" />

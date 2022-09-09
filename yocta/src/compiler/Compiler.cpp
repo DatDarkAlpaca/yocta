@@ -79,7 +79,7 @@ void yo::Compiler::emitByte(uint8_t byte)
 	currentChunk->push_back(byte, parser.previous.line);
 }
 
-void yo::Compiler::emitConstant(YoctaValue value)
+void yo::Compiler::emitConstant(Value value)
 {
 	emitByte((uint8_t)OPCode::OP_CONSTANT);
 	currentChunk->push_constant(value, parser.previous.line);
@@ -88,9 +88,7 @@ void yo::Compiler::emitConstant(YoctaValue value)
 void yo::Compiler::numeric()
 {
 	double value = std::strtod(parser.previous.start, NULL);
-
-	Value v{ ValueType::VT_NUMERIC, value };
-	emitConstant(std::get<double>(v.variantValue));
+	emitConstant({ ValueType::VT_NUMERIC, value });
 }
 
 void yo::Compiler::unary()
@@ -281,22 +279,22 @@ void yo::Compiler::intializeParserRules()
 	parseRules.insert({
 		Token::Type::T_IDENTIFIER,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_STRING,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(std::bind(&Compiler::string, this), nullptr, Precedence::P_NONE)
+	});
 
 	parseRules.insert({
 		Token::Type::T_NUMERIC,
 		Rule(std::bind(&Compiler::numeric, this), nullptr, Precedence::P_NONE)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_AND,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+	});
 
 	parseRules.insert({
 		Token::Type::T_OR,

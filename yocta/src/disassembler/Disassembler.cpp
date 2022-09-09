@@ -78,7 +78,15 @@ unsigned int yo::Disassembler::simpleInstruction(uint8_t code, int offset)
 unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& chunk, int offset)
 {
 	uint8_t constant = chunk.data[++offset];
-	printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, chunk.constantPool[constant]);
+
+	Value value = chunk.constantPool[constant];
+	if (value.variantValue.index() == 2)
+	{
+		const char* str = getObjectString(value).c_str();
+		printf("%s\t[Index]: %d | [Value]: %s\n", translateCode((OPCode)code), constant, str);
+	}
+	else
+		printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, value);
 
 	return offset + 1;
 }
