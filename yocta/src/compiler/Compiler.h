@@ -49,6 +49,11 @@ namespace yo
 		void parsePrecedence(const Precedence& precendece);
 
 	private:
+		std::string prepareStringObject() const;
+
+		StringObject* allocateStringObject(const std::string& str);
+
+	private:
 		void intializeParserRules();
 
 		Rule* getParserRule(Token::Type type);
@@ -62,6 +67,7 @@ namespace yo
 		Lexer lexer;
 		Parser parser;
 		Chunk* currentChunk = nullptr;
+		YoctaObject* objects = nullptr;
 
 	private:
 		std::unordered_map<Token::Type, Rule> parseRules;

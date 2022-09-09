@@ -174,9 +174,9 @@ void yo::Compiler::literalType()
 
 void yo::Compiler::string()
 {
-	std::string str = parser.previous.start + 1;
-	str = str.erase(parser.previous.length - 2).c_str();
-	emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(new StringObject(str)) });
+	std::string str = prepareStringObject();
+
+	emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(allocateStringObject(str)) });
 }
 
 void yo::Compiler::parsePrecedence(const Precedence& precendece)
@@ -200,6 +200,20 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 		std::function<void()> infix = getParserRule(parser.previous.type)->infix;
 		infix();
 	}
+}
+
+std::string yo::Compiler::prepareStringObject() const
+{
+	std::string str = parser.previous.start + 1;
+	str = str.erase(parser.previous.length - 2).c_str();
+	str += '\0';
+
+	return str;
+}
+
+yo::StringObject* yo::Compiler::allocateStringObject(const std::string& str)
+{
+	return new StringObject(str);
 }
 
 void yo::Compiler::intializeParserRules()
