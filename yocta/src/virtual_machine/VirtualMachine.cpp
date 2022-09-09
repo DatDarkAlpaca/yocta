@@ -12,8 +12,9 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 	while (true)
 	{
 		#ifdef DEBUG_TRACE
+		#ifdef DEBUG_VM_STACK_TRACE
 		printf("Stack: %s", vmStack.empty() ? "[]" : "");
-
+		
 		for (const Value& value : vmStack)
 		{
 			printf("[");
@@ -21,7 +22,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 			printf("]");
 		}
 		printf("\n");
-
+		#endif
 		Disassembler::disassembleInstruction(*compiler.currentChunk, (int)(IP - chunk->data.data()));
 		#endif
 
