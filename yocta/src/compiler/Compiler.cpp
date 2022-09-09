@@ -156,6 +156,29 @@ void yo::Compiler::binary()
 	}
 }
 
+void yo::Compiler::literalType()
+{
+	switch (parser.previous.type)
+	{
+	case Token::Type::T_NONE:
+		emitByte((uint8_t)OPCode::OP_NONE);
+		break;
+	case Token::Type::T_TRUE:
+		emitByte((uint8_t)OPCode::OP_TRUE);
+		break;
+	case Token::Type::T_FALSE:
+		emitByte((uint8_t)OPCode::OP_FALSE);
+		break;
+	}
+}
+
+void yo::Compiler::string()
+{
+	std::string str = parser.previous.start + 1;
+	str = str.erase(parser.previous.length - 2).c_str();
+	emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(new StringObject(str)) });
+}
+
 void yo::Compiler::parsePrecedence(const Precedence& precendece)
 {
 	advance();
