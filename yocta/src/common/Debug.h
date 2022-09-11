@@ -4,5 +4,5 @@
 #define DEBUG_TRACE
 
 #undef DEBUG_VM_STACK_TRACE
-#undef DEBUG_PRINT_SOURCE
-#undef DEBUG_TRACE
+//#undef DEBUG_PRINT_SOURCE
+//#undef DEBUG_TRACE

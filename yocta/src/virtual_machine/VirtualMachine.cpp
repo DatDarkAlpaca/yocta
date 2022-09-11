@@ -144,7 +144,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				break;
 			}
 
-			case (uint8_t)OPCode::OP_GET_GLOBAL:
+			case (uint8_t)OPCode::OP_GET_GLOBAL_VAR:
 			{
 				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
 				Value value;
@@ -159,7 +159,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				break;
 			}
 
-			case (uint8_t)OPCode::OP_SET_GLOBAL:
+			case (uint8_t)OPCode::OP_SET_GLOBAL_VAR:
 			{
 				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
 

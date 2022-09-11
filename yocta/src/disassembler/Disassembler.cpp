@@ -69,12 +69,15 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 	case (uint8_t)OPCode::OP_POP_BACK:
 		return simpleInstruction(instruction, offset);
 
-	case (uint8_t)OPCode::OP_GET_GLOBAL:
+	case (uint8_t)OPCode::OP_DEFINE_GLOBAL_VAR:
 		return constantInstruction(instruction, chunk, offset);
 
-	case (uint8_t)OPCode::OP_SET_GLOBAL:
+	case (uint8_t)OPCode::OP_GET_GLOBAL_VAR:
 		return constantInstruction(instruction, chunk, offset);
 
+	case (uint8_t)OPCode::OP_SET_GLOBAL_VAR:
+		return constantInstruction(instruction, chunk, offset);
+		
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
 		return offset + 1;
@@ -94,10 +97,19 @@ unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& ch
 	Value value = chunk.constantPool[constant];
 	if (value.variantValue.index() == 2)
 	{
-		printf("%s\t[Index]: %d | [Value]: STRING\n", translateCode((OPCode)code), constant);
+		StringObject* object = getStringObject(value);
+		printf("%s\t[Index]: %d | [Value]: %s\n", translateCode((OPCode)code), constant, object->data.c_str());
 	}
-	else
-		printf("%s\t[Index]: %d | [Value]: %g\n", translateCode((OPCode)code), constant, value);
+	else if (value.variantValue.index() == 1)
+	{
+		double v = std::get<double>(value.variantValue);
+		printf("%s\t[Index]: %d | [Value]: %f\n", translateCode((OPCode)code), constant, v);
+	}
+	else if (value.variantValue.index() == 0)
+	{
+		bool v = std::get<bool>(value.variantValue);
+		printf("%s\t[Index]: %d | [Value]: %s\n", translateCode((OPCode)code), constant, v ? "true" : "false");
+	}
 
 	return offset + 1;
 }

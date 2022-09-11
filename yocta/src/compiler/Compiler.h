@@ -77,12 +77,12 @@ namespace yo
 			if (canAssign && matchToken(TokenType::T_EQUAL))
 			{
 				expression();
-				emitByte((uint8_t)OPCode::OP_SET_GLOBAL);
+				emitByte((uint8_t)OPCode::OP_SET_GLOBAL_VAR);
 				emitByte(arg);
 			}
 			else
 			{
-				emitByte((uint8_t)OPCode::OP_GET_GLOBAL);
+				emitByte((uint8_t)OPCode::OP_GET_GLOBAL_VAR);
 				emitByte(arg);
 			}
 		}
