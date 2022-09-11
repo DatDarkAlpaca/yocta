@@ -31,7 +31,7 @@ yo::Token yo::Lexer::nextToken()
 	if (validSymbol(peek()))
 		return handleSymbol(peek());
 
-	return createToken({}, TokenType::T_NONE);
+	return createErrorToken("Unexpected token");
 }
 
 yo::Token yo::Lexer::handleNumeric()
@@ -133,6 +133,9 @@ yo::Token yo::Lexer::handleString()
 
 		nextCharacter();
 	}
+
+	if (peek() == '\0')
+		return createErrorToken("Missing close quote");
 
 	std::string tokenString;
 	tokenString.assign(start, m_Source - start);
