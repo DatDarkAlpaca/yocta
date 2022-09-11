@@ -1,5 +1,6 @@
 #pragma once
 #include <variant>
+#include <memory>
 #include "Value.h"
 #include "YoctaObject.h"
 
@@ -42,10 +43,9 @@ namespace yo
 		friend const bool operator>(const Value& lhs, const Value& rhs);
 	};
 
-	inline std::string getObjectString(const Value& value)
+	inline StringObject* getStringObject(const Value& value)
 	{
-		std::string str = ((StringObject*)(std::get<YoctaObject*>(value.variantValue)))->data;
-		return str.c_str();
+		return dynamic_cast<StringObject*>(std::get<YoctaObject*>(value.variantValue));
 	}
 
 	inline void displayValue(const Value& value)
@@ -61,7 +61,7 @@ namespace yo
 
 		else if (value.type == ValueType::VT_OBJECT)
 		{
-			auto str = getObjectString(value);
+			auto str = getStringObject(value)->data;
 
 			switch (std::get<YoctaObject*>(value.variantValue)->type)
 			{
@@ -94,10 +94,12 @@ namespace yo
 		}
 		else if (lhs.variantValue.index() == 2)
 		{
-			std::string a = getObjectString(lhs);
-			std::string b = getObjectString(rhs);
+			std::string a = getStringObject(lhs)->data;
+			std::string b = getStringObject(rhs)->data;
 
-			std::variant<bool, double, YoctaObject*>v((YoctaObject*)(new StringObject(a + b)));
+			std::string c = a.append(b);
+
+			std::variant<bool, double, YoctaObject*>v((YoctaObject*)(new StringObject(c)));
 			return { lhs.type, v };
 		}
 	}

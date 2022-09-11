@@ -29,7 +29,7 @@ namespace yo
 
 		void statement()
 		{
-			if (matchToken(Token::Type::T_PRINT))
+			if (matchToken(TokenType::T_PRINT))
 				statementPrint();
 			else
 				statementExpression();
@@ -37,7 +37,7 @@ namespace yo
 
 		void expression();
 
-		void eat(Token::Type type, const char* message);
+		void eat(TokenType type, const char* message);
 
 		void finish();
 
@@ -48,7 +48,7 @@ namespace yo
 		{
 			expression();
 
-			eat(Token::Type::T_SEMICOLON, "Expected ';' after expression.");
+			eat(TokenType::T_SEMICOLON, "Expected ';' after expression.");
 
 			emitByte((uint8_t)OPCode::OP_POP_BACK);
 		}
@@ -57,7 +57,7 @@ namespace yo
 		{
 			expression();
 
-			eat(Token::Type::T_SEMICOLON, "Expected ';' after expression.");
+			eat(TokenType::T_SEMICOLON, "Expected ';' after expression.");
 
 			emitByte((uint8_t)OPCode::OP_PRINT);
 		}
@@ -67,15 +67,10 @@ namespace yo
 		{
 			parser.panicMode = false;
 
-			while (parser.current.type != Token::Type::T_EOF)
+			while (parser.current.type != TokenType::T_EOF)
 			{
-				if (parser.previous.type == Token::Type::T_SEMICOLON)
+				if (parser.previous.type == TokenType::T_SEMICOLON)
 					return;
-
-				/*switch (parser.current.type)
-				{
-					case
-				}*/
 			}
 		}
 
@@ -105,15 +100,15 @@ namespace yo
 	private:
 		void intializeParserRules();
 
-		Rule* getParserRule(Token::Type type);
+		Rule* getParserRule(TokenType type);
 
 	private:
-		void handleErrorAtCurrentToken(const char* message);
+		void handleErrorAtCurrentToken(const std::string& message);
 
-		void handleErrorToken(Token* token, const char* message);
+		void handleErrorToken(Token* token, const std::string& message);
 
 	private:
-		bool matchToken(Token::Type type)
+		bool matchToken(TokenType type)
 		{
 			if (parser.current.type != type)
 				return false;
@@ -130,6 +125,6 @@ namespace yo
 		YoctaObject* objects = nullptr;
 
 	private:
-		std::unordered_map<Token::Type, Rule> parseRules;
+		std::unordered_map<TokenType, Rule> parseRules;
 	};
 }

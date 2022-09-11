@@ -17,7 +17,7 @@ bool yo::Compiler::compile(const char* source, Chunk* chunk)
 
 	advance();
 
-	while (!matchToken(Token::Type::T_EOF))
+	while (!matchToken(TokenType::T_EOF))
 		declaration();
 
 	finish();
@@ -31,12 +31,12 @@ void yo::Compiler::advance()
 
 	while (true)
 	{
-		parser.current = lexer.scanToken();
+		parser.current = lexer.nextToken();
 
-		if (parser.current.type != Token::Type::T_ERROR)
+		if (parser.current.type != TokenType::T_ERROR)
 			break;
 
-		handleErrorAtCurrentToken(parser.current.start);
+		handleErrorAtCurrentToken(parser.current.data);
 	}
 }
 
@@ -45,7 +45,7 @@ void yo::Compiler::expression()
 	parsePrecedence(Precedence::P_ASSIGNMENT);
 }
 
-void yo::Compiler::eat(Token::Type type, const char* message)
+void yo::Compiler::eat(TokenType type, const char* message)
 {
 	if (parser.current.type == type)
 	{
@@ -69,7 +69,7 @@ void yo::Compiler::finish()
 void yo::Compiler::grouping()
 {
 	expression();
-	eat(Token::Type::T_RIGHT_PARENTHESIS, "Expected ')' after expression.");
+	eat(TokenType::T_RIGHT_PARENTHESIS, "Expected ')' after expression.");
 }
 
 void yo::Compiler::emitByte(uint8_t byte)
@@ -85,22 +85,22 @@ void yo::Compiler::emitConstant(Value value)
 
 void yo::Compiler::numeric()
 {
-	double value = std::strtod(parser.previous.start, NULL);
+	double value = std::strtod(parser.previous.data.c_str(), NULL);
 	emitConstant({ ValueType::VT_NUMERIC, value });
 }
 
 void yo::Compiler::unary()
 {
-	Token::Type type = parser.previous.type;
+	TokenType type = parser.previous.type;
 
 	parsePrecedence(Precedence::P_UNARY);
 
 	switch (type)
 	{
-	case Token::Type::T_MINUS:
+	case TokenType::T_MINUS:
 		emitByte((uint8_t)OPCode::OP_NEGATE);
 		break;
-	case Token::Type::T_EXCLAMATION:
+	case TokenType::T_EXCLAMATION:
 		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
 	}
@@ -108,7 +108,7 @@ void yo::Compiler::unary()
 
 void yo::Compiler::binary()
 {
-	Token::Type type = parser.previous.type;
+	TokenType type = parser.previous.type;
 
 	Rule* rule = getParserRule(type);
 
@@ -116,37 +116,37 @@ void yo::Compiler::binary()
 
 	switch (type)
 	{
-	case Token::Type::T_PLUS:
+	case TokenType::T_PLUS:
 		emitByte((uint8_t)OPCode::OP_ADD);
 		break;
-	case Token::Type::T_MINUS:
+	case TokenType::T_MINUS:
 		emitByte((uint8_t)OPCode::OP_SUB);
 		break;
-	case Token::Type::T_ASTERISTIC:
+	case TokenType::T_ASTERISTIC:
 		emitByte((uint8_t)OPCode::OP_MULT);
 		break;
-	case Token::Type::T_SLASH:
+	case TokenType::T_SLASH:
 		emitByte((uint8_t)OPCode::OP_DIV);
 		break;
 		
-	case Token::Type::T_EQUAL_EQUAL:
+	case TokenType::T_EQUAL_EQUAL:
 		emitByte((uint8_t)OPCode::OP_EQUAL);
 		break;
-	case Token::Type::T_EXCLAMATION_EQUAL:
+	case TokenType::T_EXCLAMATION_EQUAL:
 		emitByte((uint8_t)OPCode::OP_EQUAL);
 		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
-	case Token::Type::T_GREATER:
+	case TokenType::T_GREATER:
 		emitByte((uint8_t)OPCode::OP_GREATER);
 		break;
-	case Token::Type::T_GREATER_EQUAL:
+	case TokenType::T_GREATER_EQUAL:
 		emitByte((uint8_t)OPCode::OP_LESS);
 		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
-	case Token::Type::T_LESS:
+	case TokenType::T_LESS:
 		emitByte((uint8_t)OPCode::OP_LESS);
 		break;
-	case Token::Type::T_LESS_EQUAL:
+	case TokenType::T_LESS_EQUAL:
 		emitByte((uint8_t)OPCode::OP_GREATER);
 		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
@@ -158,13 +158,13 @@ void yo::Compiler::literalType()
 {
 	switch (parser.previous.type)
 	{
-	case Token::Type::T_NONE:
+	case TokenType::T_NONE:
 		emitByte((uint8_t)OPCode::OP_NONE);
 		break;
-	case Token::Type::T_TRUE:
+	case TokenType::T_TRUE:
 		emitByte((uint8_t)OPCode::OP_TRUE);
 		break;
-	case Token::Type::T_FALSE:
+	case TokenType::T_FALSE:
 		emitByte((uint8_t)OPCode::OP_FALSE);
 		break;
 	}
@@ -180,7 +180,7 @@ void yo::Compiler::string()
 void yo::Compiler::parsePrecedence(const Precedence& precendece)
 {
 	advance();
-	Token::Type type = parser.previous.type;
+	TokenType type = parser.previous.type;
 	std::function<void()> prefix = getParserRule(type)->prefix;
 
 	if (!prefix)
@@ -202,9 +202,8 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 
 std::string yo::Compiler::prepareStringObject() const
 {
-	std::string str = parser.previous.start + 1;
-	str = str.erase(parser.previous.length - 2).c_str();
-	str += '\0';
+	std::string str = parser.previous.data;
+	std::string a = parser.current.data;
 
 	return str;
 }
@@ -217,217 +216,217 @@ yo::StringObject* yo::Compiler::allocateStringObject(const std::string& str)
 void yo::Compiler::intializeParserRules()
 {
 	parseRules.insert({
-		Token::Type::T_LEFT_PARENTHESIS,
+		TokenType::T_LEFT_PARENTHESIS,
 		Rule(std::bind(&Compiler::grouping, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_RIGHT_PARENTHESIS,
+		TokenType::T_RIGHT_PARENTHESIS,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_LEFT_BRACES,
+		TokenType::T_LEFT_BRACES,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_RIGHT_BRACES,
+		TokenType::T_RIGHT_BRACES,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_COMMA,
+		TokenType::T_COMMA,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_DOT,
+		TokenType::T_DOT,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_MINUS,
+		TokenType::T_MINUS,
 		Rule(std::bind(&Compiler::unary, this), std::bind(&Compiler::binary, this), Precedence::P_TERM)
 	});
 
 	parseRules.insert({
-		Token::Type::T_PLUS,
+		TokenType::T_PLUS,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_TERM)
 	});
 
 	parseRules.insert({
-		Token::Type::T_SLASH,
+		TokenType::T_SLASH,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_FACTOR)
 		});
 
 	parseRules.insert({
-		Token::Type::T_ASTERISTIC,
+		TokenType::T_ASTERISTIC,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_FACTOR)
 	});
 
 	parseRules.insert({
-		Token::Type::T_SEMICOLON,
+		TokenType::T_SEMICOLON,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_EXCLAMATION,
+		TokenType::T_EXCLAMATION,
 		Rule(std::bind(&Compiler::unary, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_EXCLAMATION_EQUAL,
+		TokenType::T_EXCLAMATION_EQUAL,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_EQUAL)
 	});
 
 	parseRules.insert({
-		Token::Type::T_EQUAL,
+		TokenType::T_EQUAL,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_EQUAL_EQUAL,
+		TokenType::T_EQUAL_EQUAL,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_GREATER,
+		TokenType::T_GREATER,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_GREATER_EQUAL,
+		TokenType::T_GREATER_EQUAL,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_LESS,
+		TokenType::T_LESS,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_LESS_EQUAL,
+		TokenType::T_LESS_EQUAL,
 		Rule(nullptr, std::bind(&Compiler::binary, this), Precedence::P_COMPARE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_IDENTIFIER,
+		TokenType::T_IDENTIFIER,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_STRING,
+		TokenType::T_STRING,
 		Rule(std::bind(&Compiler::string, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_NUMERIC,
+		TokenType::T_NUMERIC,
 		Rule(std::bind(&Compiler::numeric, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_AND,
+		TokenType::T_AND,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_OR,
+		TokenType::T_OR,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_IF,
+		TokenType::T_IF,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_ELSE,
+		TokenType::T_ELSE,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_FALSE,
+		TokenType::T_FALSE,
 		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_TRUE,
+		TokenType::T_TRUE,
 		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_FOR,
+		TokenType::T_FOR,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_WHILE,
+		TokenType::T_WHILE,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_NONE,
+		TokenType::T_NONE,
 		Rule(std::bind(&Compiler::literalType, this), nullptr, Precedence::P_NONE)
 	});
 
 	parseRules.insert({
-		Token::Type::T_PRINT,
+		TokenType::T_PRINT,
+		Rule(nullptr, nullptr, Precedence::P_NONE)
+	});
+
+	parseRules.insert({
+		TokenType::T_VAR,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_VAR,
+		TokenType::T_FUNC,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_FUN,
+		TokenType::T_RETURN,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_RETURN,
+		TokenType::T_CLASS,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_CLASS,
+		TokenType::T_SUPER,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_SUPER,
+		TokenType::T_THIS,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_THIS,
+		TokenType::T_ERROR,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 
 	parseRules.insert({
-		Token::Type::T_ERROR,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
-
-	parseRules.insert({
-		Token::Type::T_EOF,
+		TokenType::T_EOF,
 		Rule(nullptr, nullptr, Precedence::P_NONE)
 		});
 }
 
-yo::Rule* yo::Compiler::getParserRule(Token::Type type)
+yo::Rule* yo::Compiler::getParserRule(TokenType type)
 {
 	return &parseRules[type];
 }
 
-void yo::Compiler::handleErrorAtCurrentToken(const char* message)
+void yo::Compiler::handleErrorAtCurrentToken(const std::string& message)
 {
 	handleErrorToken(&parser.current, message);
 }
 
-void yo::Compiler::handleErrorToken(Token* token, const char* message)
+void yo::Compiler::handleErrorToken(Token* token, const std::string& message)
 {
 	if (parser.panicMode)
 		return;
@@ -436,14 +435,14 @@ void yo::Compiler::handleErrorToken(Token* token, const char* message)
 
 	fprintf(stderr, "<Line %d> Error ", token->line);
 
-	if (token->type == Token::Type::T_EOF)
+	if (token->type == TokenType::T_EOF)
 		fprintf(stderr, "at the end of the file");
 
-	else if (token->type == Token::Type::T_ERROR) {}
+	else if (token->type == TokenType::T_ERROR) {}
 
 	else
-		fprintf(stderr, "at '%.*s'", token->length, token->start);
+		fprintf(stderr, "at '%.*s'", token->data.length(), token->data.c_str());
 
-	fprintf(stderr, ": %s\n", message);
+	fprintf(stderr, ": %s\n", message.c_str());
 	parser.errorFound = true;
 }

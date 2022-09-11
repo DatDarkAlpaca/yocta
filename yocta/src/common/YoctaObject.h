@@ -11,19 +11,23 @@ namespace yo
 
 	struct YoctaObject
 	{
+	public:
 		YoctaObject(ObjectType type)
 			: type(type) { }
 
+		virtual ~YoctaObject() = default;
+
+	public:
 		ObjectType type;
 	};
 
-	struct StringObject
+	struct StringObject : public YoctaObject
 	{
 	public:
 		StringObject(const std::string& string)
-			: object(ObjectType::STRING), data(string) {}
+			: YoctaObject(ObjectType::STRING), data(string) {}
 
-		YoctaObject object;
+	public:
 		std::string data;
 	};
 }
