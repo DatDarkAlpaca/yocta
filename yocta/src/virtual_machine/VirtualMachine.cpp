@@ -135,6 +135,43 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 			case (uint8_t)OPCode::OP_POP_BACK:
 				vmStack.pop_back();
 				break;
+
+			case (uint8_t)OPCode::OP_DEFINE_GLOBAL_VAR:
+			{
+				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
+				vmGlobals[name->data] = vmStack.back();
+				vmStack.pop_back();
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_GET_GLOBAL:
+			{
+				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
+				Value value;
+
+				if (vmGlobals.find(name->data) == vmGlobals.end())
+				{
+					// HANDLE RUNTIME EXCEPTIONS
+					return InterpretResult::RUNTIME_ERROR;
+				}
+
+				vmStack.push_back(vmGlobals[name->data]);
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_SET_GLOBAL:
+			{
+				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
+
+				if (vmGlobals.find(name->data) == vmGlobals.end())
+				{
+					// HANDLE RUNTIME EXCEPTIONS
+					return InterpretResult::RUNTIME_ERROR;
+				}
+
+				vmGlobals[name->data] = vmStack.back();
+				break;
+			}
 		}
 	}
 }

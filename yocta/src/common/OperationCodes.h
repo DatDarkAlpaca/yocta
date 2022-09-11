@@ -21,7 +21,10 @@ namespace yo
 		OP_LESS,
 		OP_GREATER,
 		OP_PRINT,
-		OP_POP_BACK
+		OP_POP_BACK,
+		OP_DEFINE_GLOBAL_VAR,
+		OP_GET_GLOBAL,
+		OP_SET_GLOBAL
 	};
 
 	inline const char* translateCode(const OPCode& code)
@@ -78,8 +81,17 @@ namespace yo
 
 			case OPCode::OP_POP_BACK:
 				return "OP_POP_BACK"; 
-		}
 
+			case OPCode::OP_DEFINE_GLOBAL_VAR:
+				return "OP_DEFINE_GLOBAL_VAR";
+
+			case OPCode::OP_GET_GLOBAL:
+				return "OP_GET_GLOBAL";				
+
+			case OPCode::OP_SET_GLOBAL:
+				return "OP_SET_GLOBAL";
+		}
+		
 		return "";
 	}
 }

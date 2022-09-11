@@ -69,6 +69,12 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 	case (uint8_t)OPCode::OP_POP_BACK:
 		return simpleInstruction(instruction, offset);
 
+	case (uint8_t)OPCode::OP_GET_GLOBAL:
+		return constantInstruction(instruction, chunk, offset);
+
+	case (uint8_t)OPCode::OP_SET_GLOBAL:
+		return constantInstruction(instruction, chunk, offset);
+
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
 		return offset + 1;

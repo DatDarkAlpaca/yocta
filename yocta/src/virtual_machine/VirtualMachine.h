@@ -18,6 +18,7 @@ namespace yo
 	private:
 		const Value& peek(int distance) const
 		{
+			// TODO: fix it
 			return vmStack.at(- 1 - distance);
 		}
 
@@ -37,6 +38,7 @@ namespace yo
 	private:
 		const uint8_t* IP = nullptr;
 		std::vector<Value> vmStack;
+		std::unordered_map<std::string, Value> vmGlobals;
 
 	private:
 		Compiler compiler;

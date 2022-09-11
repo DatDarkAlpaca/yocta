@@ -22,18 +22,11 @@ namespace yo
 	private:
 		void advance();
 
-		void declaration()
-		{
-			statement();
-		}
+		void declaration();
 
-		void statement()
-		{
-			if (matchToken(TokenType::T_PRINT))
-				statementPrint();
-			else
-				statementExpression();
-		}
+		void variableDeclaration();
+
+		void statement();
 
 		void expression();
 
@@ -44,35 +37,17 @@ namespace yo
 		void grouping();
 
 	private:
-		void statementExpression()
-		{
-			expression();
+		void statementExpression();
 
-			eat(TokenType::T_SEMICOLON, "Expected ';' after expression.");
-
-			emitByte((uint8_t)OPCode::OP_POP_BACK);
-		}
-
-		void statementPrint()
-		{
-			expression();
-
-			eat(TokenType::T_SEMICOLON, "Expected ';' after expression.");
-
-			emitByte((uint8_t)OPCode::OP_PRINT);
-		}
+		void statementPrint();
 
 	private:
-		void synchronize()
-		{
-			parser.panicMode = false;
+		uint8_t parseVariable(const char* message);
 
-			while (parser.current.type != TokenType::T_EOF)
-			{
-				if (parser.previous.type == TokenType::T_SEMICOLON)
-					return;
-			}
-		}
+		void defineVariable(uint8_t globalVariable);
+
+	private:
+		void synchronize();
 
 	private:
 		void emitByte(uint8_t byte);
@@ -80,17 +55,42 @@ namespace yo
 		void emitConstant(Value value);
 
 	private:
-		void numeric();
+		void numeric(bool canAssign);
 		
-		void unary();
+		void unary(bool canAssign);
 
-		void binary();
+		void binary(bool canAssign);
 
-		void literalType();
+		void literalType(bool canAssign);
 
-		void string();
+		void string(bool canAssign);
+
+		void variable(bool canAssign)
+		{
+			namedVariable(parser.previous, canAssign);
+		}
+
+		void namedVariable(Token name, bool canAssign)
+		{
+			uint8_t arg = identifierConstant(&name);
+
+			if (canAssign && matchToken(TokenType::T_EQUAL))
+			{
+				expression();
+				emitByte((uint8_t)OPCode::OP_SET_GLOBAL);
+				emitByte(arg);
+			}
+			else
+			{
+				emitByte((uint8_t)OPCode::OP_GET_GLOBAL);
+				emitByte(arg);
+			}
+		}
 
 		void parsePrecedence(const Precedence& precendece);
+
+	private:
+		uint8_t identifierConstant(Token* name);
 
 	private:
 		std::string prepareStringObject() const;
@@ -108,15 +108,7 @@ namespace yo
 		void handleErrorToken(Token* token, const std::string& message);
 
 	private:
-		bool matchToken(TokenType type)
-		{
-			if (parser.current.type != type)
-				return false;
-
-			advance();
-
-			return true;
-		}
+		bool matchToken(TokenType type);
 
 	public:
 		Lexer lexer;
