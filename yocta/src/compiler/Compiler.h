@@ -53,6 +53,8 @@ namespace yo
 
 		void statementWhile();
 
+		void statementFor();
+
 	private:
 		uint8_t parseVariable(const char* message);
 

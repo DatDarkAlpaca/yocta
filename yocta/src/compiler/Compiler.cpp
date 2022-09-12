@@ -70,6 +70,8 @@ void yo::Compiler::statement()
 		statementIf();
 	else if (matchToken(TokenType::T_WHILE))
 		statementWhile();
+	else if (matchToken(TokenType::T_FOR))
+		statementFor();
 	else if (matchToken(TokenType::T_LEFT_BRACES))
 	{
 		startScope();
@@ -200,6 +202,61 @@ void yo::Compiler::statementWhile()
 
 	patchJump(exitJump);
 	emitByte((uint8_t)OPCode::OP_POP_BACK);
+}
+
+void yo::Compiler::statementFor()
+{
+	startScope();
+
+	eat(TokenType::T_LEFT_PARENTHESIS, "Expected a '('");
+
+	if (matchToken(TokenType::T_SEMICOLON))
+		{ }
+	else if (matchToken(TokenType::T_VAR))
+		variableDeclaration();
+	else
+		statementExpression();
+
+	int loopStart = currentChunk->data.size();
+	int exit = -1;
+
+	if (!matchToken(TokenType::T_SEMICOLON))
+	{
+		expression();
+		eat(TokenType::T_SEMICOLON, "Expected a ';' after loop condition");
+
+		exit = emitJump((uint8_t)OPCode::OP_JUMP_IF_FALSE);
+		emitByte((uint8_t)OPCode::OP_POP_BACK);
+	}
+	
+	if (!matchToken(TokenType::T_RIGHT_PARENTHESIS)) 
+	{
+		int bodyJump = emitJump((uint8_t)OPCode::OP_JUMP);
+		int incrementStart = currentChunk->data.size();
+
+		expression();
+
+		emitByte((uint8_t)OPCode::OP_POP_BACK);
+
+		eat(TokenType::T_RIGHT_PARENTHESIS, "Expected a ')'");
+
+		emitLoop(loopStart);
+
+		loopStart = incrementStart;
+
+		patchJump(bodyJump);
+	}
+
+	statement();
+	emitLoop(loopStart);
+	
+	if (exit != -1)
+	{
+		patchJump(exit);
+		emitByte((uint8_t)OPCode::OP_POP_BACK);
+	}
+
+	endScope();
 }
 
 uint8_t yo::Compiler::parseVariable(const char* message)
