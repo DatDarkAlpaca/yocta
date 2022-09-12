@@ -85,8 +85,21 @@ yo::Token yo::Lexer::handleSymbol(char symbol)
 		case '*': return createToken("*", TokenType::T_ASTERISTIC);
 		case '/': return createToken("/", TokenType::T_SLASH);
 
-		case '&': return createToken("&", TokenType::T_AMPERSTAND);
-		case '|': return createToken("|", TokenType::T_PIPE);
+		case '&': 
+		{
+			TokenType type = matchesNext('&') ? TokenType::T_AND : TokenType::T_AMPERSTAND;
+			const char* symbol = matchesNext('&') ? "&&" : "&";
+			nextCharacter();
+			return createToken(symbol, type);
+		}
+
+		case '|': 
+		{
+			TokenType type = matchesNext('|') ? TokenType::T_OR : TokenType::T_PIPE;
+			const char* symbol = matchesNext('|') ? "||" : "|";
+			nextCharacter();
+			return createToken(symbol, type);
+		}
 
 		case '!':
 		{
