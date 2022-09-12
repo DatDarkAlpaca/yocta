@@ -68,6 +68,8 @@ void yo::Compiler::statement()
 		statementPrint();
 	else if (matchToken(TokenType::T_IF))
 		statementIf();
+	else if (matchToken(TokenType::T_WHILE))
+		statementWhile();
 	else if (matchToken(TokenType::T_LEFT_BRACES))
 	{
 		startScope();
@@ -182,6 +184,24 @@ void yo::Compiler::statementIf()
 	patchJump(elseJump);
 }
 
+void yo::Compiler::statementWhile()
+{
+	int loopStart = currentChunk->data.size();
+
+	eat(TokenType::T_LEFT_PARENTHESIS, "Expected a '('");
+	expression();
+	eat(TokenType::T_RIGHT_PARENTHESIS, "Expected a ')'");
+
+	int exitJump = emitJump((uint8_t)OPCode::OP_JUMP_IF_FALSE);
+	emitByte((uint8_t)OPCode::OP_POP_BACK);
+	statement();
+
+	emitLoop(loopStart);
+
+	patchJump(exitJump);
+	emitByte((uint8_t)OPCode::OP_POP_BACK);
+}
+
 uint8_t yo::Compiler::parseVariable(const char* message)
 {
 	eat(TokenType::T_IDENTIFIER, message);
@@ -269,6 +289,18 @@ int yo::Compiler::emitJump(uint8_t instruction)
 	emitByte(0xFF);
 	emitByte(0xFF);
 	return currentChunk->data.size() - 2;
+}
+
+void yo::Compiler::emitLoop(int loopStart)
+{
+	emitByte((uint8_t)OPCode::OP_LOOP);
+
+	int offset = currentChunk->data.size() - loopStart + 2;
+	if (offset > UINT16_MAX)
+		handleErrorAtCurrentToken("The previous while offset was too large");
+
+	emitByte((offset >> 8) & 0xff);
+	emitByte(offset & 0xff);
 }
 
 void yo::Compiler::patchJump(int offset)

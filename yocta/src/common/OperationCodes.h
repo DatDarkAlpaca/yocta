@@ -28,7 +28,8 @@ namespace yo
 		OP_GET_LOCAL_VAR,
 		OP_SET_LOCAL_VAR,
 		OP_JUMP,
-		OP_JUMP_IF_FALSE
+		OP_JUMP_IF_FALSE,
+		OP_LOOP
 	};
 
 	inline const char* translateCode(const OPCode& code)
@@ -106,6 +107,9 @@ namespace yo
 
 			case OPCode::OP_JUMP_IF_FALSE:
 				return "OP_JUMP_IF_FALSE";
+
+			case OPCode::OP_LOOP:
+				return "OP_LOOP";
 		}
 		
 		return "";

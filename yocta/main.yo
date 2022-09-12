@@ -1,11 +1,6 @@
-var a = 2;
-var b = 3;
-
-if(b > a)
+var count = 10;
+while(count > 0)
 {
-	print(b);
-}
-else
-{
-	print(a);
+	print(count);
+	count = count - 1;
 }

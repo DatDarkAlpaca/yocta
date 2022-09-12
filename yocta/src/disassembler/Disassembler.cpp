@@ -91,6 +91,9 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 	case (uint8_t)OPCode::OP_JUMP_IF_FALSE:
 		return jumpInstruction(instruction, 1, chunk, offset);
 
+	case (uint8_t)OPCode::OP_LOOP:
+		return jumpInstruction(instruction, -1, chunk, offset);
+
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
 		return offset + 1;

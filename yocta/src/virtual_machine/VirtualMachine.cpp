@@ -208,6 +208,13 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 					IP += offset;
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_LOOP:
+			{
+				uint16_t offset = readShort();
+				IP -= offset;
+				break;
+			}
 		}
 	}
 }

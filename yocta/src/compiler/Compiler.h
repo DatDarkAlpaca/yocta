@@ -51,6 +51,8 @@ namespace yo
 
 		void statementIf();
 
+		void statementWhile();
+
 	private:
 		uint8_t parseVariable(const char* message);
 
@@ -69,6 +71,8 @@ namespace yo
 		void emitConstant(Value value);
 
 		int emitJump(uint8_t instruction);
+
+		void emitLoop(int loopStart);
 
 	private:
 		void patchJump(int offset);
