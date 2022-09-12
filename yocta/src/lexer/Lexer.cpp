@@ -16,6 +16,9 @@ yo::Token yo::Lexer::nextToken()
 	while (std::isspace(peek()))
 		nextCharacter();
 
+	if (peek() == '/')
+		handleComments();
+
 	if (peek() == '\0')
 		return createToken("\0", TokenType::T_EOF);
 
@@ -158,6 +161,33 @@ yo::Token yo::Lexer::handleString()
 	nextCharacter();
 
 	return { tokenString, TokenType::T_STRING, m_Line };
+}
+
+void yo::Lexer::handleComments()
+{
+	bool isMultiline = false;
+	nextCharacter();
+
+	if (peek() == '/')
+	{
+		while (peek() != '\n')
+			nextCharacter();
+	}
+	else if (peek() == '*')
+	{
+		isMultiline = true;
+		nextCharacter();
+		while (peek() != '*' && peek(1) != '/')
+			nextCharacter();
+	}
+
+	if (isMultiline)
+	{
+		nextCharacter();
+		nextCharacter();
+	}
+
+	nextCharacter();
 }
 
 bool yo::Lexer::validSymbol(char symbol) const

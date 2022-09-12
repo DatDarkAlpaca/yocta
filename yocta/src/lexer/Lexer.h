@@ -35,6 +35,8 @@ namespace yo
 
 		Token handleString();
 
+		void handleComments();
+
 	private:
 		bool validSymbol(char symbol) const;
 
@@ -46,7 +48,7 @@ namespace yo
 		TokenType getIdentifierType(const std::string& identifier) const;
 
 	private:
-		inline char peek() const { return *m_Source; }
+		inline char peek(int offset = 0) const { return *(m_Source + offset); }
 
 		char nextCharacter() { return *m_Source++; }
 
