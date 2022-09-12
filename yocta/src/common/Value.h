@@ -34,22 +34,22 @@ namespace yo
 			: type(ValueType::VT_NUMERIC), variantValue(number) { }
 
 		Value(const std::string& str)
-			: type(ValueType::VT_OBJECT), variantValue(new StringObject(str)) { }
+			: type(ValueType::VT_OBJECT), variantValue((YoctaObject*)(new StringObject(str))) { }
 
 	public:
 		ValueType type = ValueType::VT_NONE;
 		std::variant<bool, double, YoctaObject*> variantValue = false;
 
 	public:
-		friend const Value& operator-(const Value& lhs);
+		friend Value operator-(const Value& lhs);
 
-		friend const Value& operator+(const Value& lhs, const Value& rhs);
+		friend Value operator+(const Value& lhs, const Value& rhs);
 
-		friend const Value& operator-(const Value& lhs, const Value& rhs);
+		friend Value operator-(const Value& lhs, const Value& rhs);
 
-		friend const Value& operator*(const Value& lhs, const Value& rhs);
+		friend Value operator*(const Value& lhs, const Value& rhs);
 
-		friend const Value& operator/(const Value& lhs, const Value& rhs);
+		friend Value operator/(const Value& lhs, const Value& rhs);
 
 		friend const bool operator==(const Value& lhs, const Value& rhs);
 
@@ -87,13 +87,13 @@ namespace yo
 		}
 	}
 
-	inline const Value& operator-(const Value& lhs)
+	inline Value operator-(const Value& lhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
 		return { -a };
 	}
 
-	inline const Value& operator+(const Value& lhs, const Value& rhs)
+	inline Value operator+(const Value& lhs, const Value& rhs)
 	{
 		if (lhs.type != rhs.type)
 			return {};
@@ -118,7 +118,7 @@ namespace yo
 		}
 	}
 
-	inline const Value& operator-(const Value& lhs, const Value& rhs)
+	inline Value operator-(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
@@ -126,7 +126,7 @@ namespace yo
 		return { a - b };
 	}
 
-	inline const Value& operator*(const Value& lhs, const Value& rhs)
+	inline Value operator*(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
@@ -134,7 +134,7 @@ namespace yo
 		return { a * b };
 	}
 
-	inline const Value& operator/(const Value& lhs, const Value& rhs)
+	inline Value operator/(const Value& lhs, const Value& rhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
