@@ -262,6 +262,28 @@ void yo::Compiler::string(bool canAssign)
 	emitConstant({ str });
 }
 
+void yo::Compiler::variable(bool canAssign)
+{
+	namedVariable(parser.previous, canAssign);
+}
+
+void yo::Compiler::namedVariable(Token name, bool canAssign)
+{
+	uint8_t arg = identifierConstant(&name);
+
+	if (canAssign && matchToken(TokenType::T_EQUAL))
+	{
+		expression();
+		emitByte((uint8_t)OPCode::OP_SET_GLOBAL_VAR);
+		emitByte(arg);
+	}
+	else
+	{
+		emitByte((uint8_t)OPCode::OP_GET_GLOBAL_VAR);
+		emitByte(arg);
+	}
+}
+
 void yo::Compiler::parsePrecedence(const Precedence& precendece)
 {
 	advance();
@@ -291,7 +313,6 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 
 uint8_t yo::Compiler::identifierConstant(Token* name)
 {
-	//return makeConstant(name);
 	currentChunk->push_constant_only({ name->data });
 	return (uint8_t)currentChunk->constantPool.size() - 1;
 }

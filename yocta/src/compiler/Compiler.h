@@ -65,27 +65,9 @@ namespace yo
 
 		void string(bool canAssign);
 
-		void variable(bool canAssign)
-		{
-			namedVariable(parser.previous, canAssign);
-		}
+		void variable(bool canAssign);
 
-		void namedVariable(Token name, bool canAssign)
-		{
-			uint8_t arg = identifierConstant(&name);
-
-			if (canAssign && matchToken(TokenType::T_EQUAL))
-			{
-				expression();
-				emitByte((uint8_t)OPCode::OP_SET_GLOBAL_VAR);
-				emitByte(arg);
-			}
-			else
-			{
-				emitByte((uint8_t)OPCode::OP_GET_GLOBAL_VAR);
-				emitByte(arg);
-			}
-		}
+		void namedVariable(Token name, bool canAssign);
 
 		void parsePrecedence(const Precedence& precendece);
 

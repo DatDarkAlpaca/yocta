@@ -16,11 +16,7 @@ namespace yo
 		InterpretResult interpret(const char* source);
 
 	private:
-		const Value& peek(int distance) const
-		{
-			// TODO: fix it
-			return vmStack.at(- 1 - distance);
-		}
+		const Value& peek(int distance) const;
 
 		uint8_t readByte();
 
@@ -42,17 +38,13 @@ namespace yo
 		template<typename... Values>
 		void runtimeError(const char* format, Values... value)
 		{
-			// TODO: calculate instruction number.
-			size_t instruction = 1;
+			size_t instruction = IP - &compiler.currentChunk->data.front() - 1;
 			printf("<Line %d> ", compiler.currentChunk->lines[instruction]);
 			printf(format, forward_or_transform(value)...);
 		}
 
 	private:
-		inline bool isBooleanFalse(const Value& value) const
-		{
-			return value.type == ValueType::VT_NONE || (value.type == ValueType::VT_BOOL && !std::get<bool>(value.variantValue));
-		}
+		inline bool isBooleanFalse(const Value& value) const;
 
 	private:
 		const uint8_t* IP = nullptr;

@@ -15,6 +15,11 @@ void yo::Chunk::push_constant(Value value, int lineNumber)
 	lines.push_back(lineNumber);
 }
 
+void yo::Chunk::push_constant_only(Value value)
+{
+	constantPool.push_back(value);
+}
+
 void yo::Chunk::clear()
 {
 	data.clear();

@@ -199,6 +199,14 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::interpret(const char* so
 	return result;
 }
 
+const yo::Value& yo::VirtualMachine::peek(int distance) const
+{
+	if (distance > vmStack.size() + 1)
+		throw "Index out of range";
+
+	return vmStack[-1 - distance];
+}
+
 uint8_t yo::VirtualMachine::readByte()
 {
 	return *IP++;
@@ -245,4 +253,9 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 		vmStack.push_back({ a < b });
 		break;
 	}
+}
+
+inline bool yo::VirtualMachine::isBooleanFalse(const Value& value) const
+{
+	return value.type == ValueType::VT_NONE || (value.type == ValueType::VT_BOOL && !std::get<bool>(value.variantValue));
 }

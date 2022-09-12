@@ -17,10 +17,7 @@ namespace yo
 
 		void push_constant(Value value, int lineNumber);
 
-		void push_constant_only(Value value)
-		{
-			constantPool.push_back(value);
-		}
+		void push_constant_only(Value value);
 
 		void clear();
 
