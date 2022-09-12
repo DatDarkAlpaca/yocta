@@ -172,6 +172,11 @@ void yo::Lexer::handleComments()
 	{
 		while (peek() != '\n')
 			nextCharacter();
+
+		nextCharacter();
+
+		if (peek() == '/')
+			handleComments();
 	}
 	else if (peek() == '*')
 	{
@@ -179,6 +184,7 @@ void yo::Lexer::handleComments()
 		nextCharacter();
 		while (peek() != '*' && peek(1) != '/')
 			nextCharacter();
+		nextCharacter();
 	}
 
 	if (isMultiline)
@@ -186,8 +192,6 @@ void yo::Lexer::handleComments()
 		nextCharacter();
 		nextCharacter();
 	}
-
-	nextCharacter();
 }
 
 bool yo::Lexer::validSymbol(char symbol) const
