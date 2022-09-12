@@ -179,6 +179,20 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				vmGlobals[name->data] = vmStack.back();
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_GET_LOCAL_VAR:
+			{
+				uint8_t slot = readByte();
+				vmStack.push_back(vmStack[slot]);
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_SET_LOCAL_VAR:
+			{
+				uint8_t slot = readByte();
+				vmStack[slot] = vmStack.back();
+				break;
+			}
 		}
 	}
 }
@@ -199,7 +213,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::interpret(const char* so
 	return result;
 }
 
-const yo::Value& yo::VirtualMachine::peek(int distance) const
+const yo::Value& yo::VirtualMachine::peek(unsigned int distance) const
 {
 	if (distance > vmStack.size() + 1)
 		throw "Index out of range";

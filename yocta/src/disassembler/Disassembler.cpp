@@ -78,7 +78,13 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 
 	case (uint8_t)OPCode::OP_SET_GLOBAL_VAR:
 		return constantInstruction(instruction, chunk, offset);
-		
+
+	case (uint8_t)OPCode::OP_SET_LOCAL_VAR:
+		return byteInstruction("OP_SET_LOCAL", chunk, offset);
+
+	case (uint8_t)OPCode::OP_GET_LOCAL_VAR:
+		return byteInstruction("OP_GET_LOCAL", chunk, offset);
+
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
 		return offset + 1;
@@ -113,4 +119,11 @@ unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& ch
 	}
 
 	return offset + 1;
+}
+
+unsigned int yo::Disassembler::byteInstruction(const char* name, const Chunk& chunk, int offset)
+{
+	uint8_t slot = chunk.data[offset + 1];
+	printf("%-16s %4d\n", name, slot);
+	return offset + 2;
 }

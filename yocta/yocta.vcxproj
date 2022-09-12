@@ -167,6 +167,7 @@
     <None Include="main.yo" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\compiler\LocalVar.h" />
     <ClInclude Include="src\common\StringHelper.h" />
     <ClInclude Include="src\common\Debug.h" />
     <ClInclude Include="src\common\YoctaObject.h" />

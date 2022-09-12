@@ -81,5 +81,8 @@
     <ClInclude Include="src\common\YoctaObject.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\compiler\LocalVar.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -16,7 +16,7 @@ namespace yo
 		InterpretResult interpret(const char* source);
 
 	private:
-		const Value& peek(int distance) const;
+		const Value& peek(unsigned int distance) const;
 
 		uint8_t readByte();
 

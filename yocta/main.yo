@@ -1,1 +1,9 @@
-var a = 1;
+{
+	var a = 3;
+	a = 4;
+	{
+		var a = 3;
+		print a;
+	}
+	print a;
+}

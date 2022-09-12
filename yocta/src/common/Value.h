@@ -76,7 +76,7 @@ namespace yo
 
 		else if (value.type == ValueType::VT_OBJECT)
 		{
-			auto str = getStringObject(value)->data;
+			std::string str = getStringObject(value)->data;
 
 			switch (std::get<YoctaObject*>(value.variantValue)->type)
 			{
@@ -116,6 +116,8 @@ namespace yo
 			std::string c = a.append(b);
 			return { c };
 		}
+
+		return {};
 	}
 
 	inline Value operator-(const Value& lhs, const Value& rhs)
@@ -162,6 +164,8 @@ namespace yo
 			double b = std::get<double>(rhs.variantValue);
 			return a == b;
 		}
+
+		return false;
 	}
 
 	inline const bool operator<(const Value& lhs, const Value& rhs)
@@ -184,6 +188,8 @@ namespace yo
 			double b = std::get<double>(rhs.variantValue);
 			return a < b;
 		}
+
+		return false;
 	}
 
 	inline const bool operator>(const Value& lhs, const Value& rhs)
@@ -206,5 +212,7 @@ namespace yo
 			double b = std::get<double>(rhs.variantValue);
 			return a > b;
 		}
+
+		return false;
 	}
 }

@@ -119,6 +119,8 @@ yo::Token yo::Lexer::handleSymbol(char symbol)
 			return createToken(symbol, type);
 		}
 	}
+
+	return createErrorToken("Undefined symbol");
 }
 
 yo::Token yo::Lexer::handleString()

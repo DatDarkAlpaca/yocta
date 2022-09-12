@@ -66,6 +66,12 @@ void yo::Compiler::statement()
 {
 	if (matchToken(TokenType::T_PRINT))
 		statementPrint();
+	else if (matchToken(TokenType::T_LEFT_BRACES))
+	{
+		startScope();
+		scopeBlock();
+		endScope();
+	}
 	else
 		statementExpression();
 }
@@ -102,6 +108,30 @@ void yo::Compiler::grouping()
 	eat(TokenType::T_RIGHT_PARENTHESIS, "Expected ')' after expression");
 }
 
+void yo::Compiler::startScope()
+{
+	++localStack.scopeDepth;
+}
+
+void yo::Compiler::scopeBlock()
+{
+	while (!checkToken(TokenType::T_RIGHT_BRACES) && !checkToken(TokenType::T_EOF))
+		declaration();
+
+	eat(TokenType::T_RIGHT_BRACES, "Expected '}' after declaration");
+}
+
+void yo::Compiler::endScope()
+{
+	--localStack.scopeDepth;
+
+	while (localStack.locals.size() > 0 && (unsigned int)localStack.locals.back().depth > localStack.scopeDepth)
+	{
+		emitByte((uint8_t)OPCode::OP_POP_BACK);
+		localStack.locals.pop_back();
+	}
+}
+
 void yo::Compiler::statementExpression()
 {
 	expression();
@@ -123,13 +153,45 @@ void yo::Compiler::statementPrint()
 uint8_t yo::Compiler::parseVariable(const char* message)
 {
 	eat(TokenType::T_IDENTIFIER, message);
+
+	declareVariable();
+	if (localStack.scopeDepth > 0)
+		return 0;
+
 	return identifierConstant(&parser.previous);
 }
 
 void yo::Compiler::defineVariable(uint8_t globalVariable)
 {
+	if (localStack.scopeDepth > 0)
+		return markInitialized();
+
 	emitByte((uint8_t)OPCode::OP_DEFINE_GLOBAL_VAR);
 	emitByte(globalVariable);
+}
+
+void yo::Compiler::declareVariable()
+{
+	if (localStack.scopeDepth == 0)
+		return;
+
+	Token* name = &parser.previous;
+	for (int i = localStack.locals.size() - 1; i >= 0; --i)
+	{
+		LocalVar var = localStack.locals[i];
+		if (var.depth != -1 && var.depth < (int)localStack.scopeDepth)
+			break;
+
+		if (*name == var.name)
+			handleErrorAtCurrentToken("A variable assigned to this name already exists in this scope");
+	}
+
+	addLocal(*name);
+}
+
+void yo::Compiler::markInitialized()
+{
+	localStack.locals.back().depth = localStack.scopeDepth;
 }
 
 void yo::Compiler::synchronize()
@@ -269,18 +331,31 @@ void yo::Compiler::variable(bool canAssign)
 
 void yo::Compiler::namedVariable(Token name, bool canAssign)
 {
-	uint8_t arg = identifierConstant(&name);
+	OPCode getOperation, setOperation;
+	int arg = resolveLocal(name);
+
+	if (arg != -1)
+	{
+		getOperation = OPCode::OP_GET_LOCAL_VAR;
+		setOperation = OPCode::OP_SET_LOCAL_VAR;
+	}
+	else
+	{
+		arg = identifierConstant(&name);
+		getOperation = OPCode::OP_GET_GLOBAL_VAR;
+		setOperation = OPCode::OP_SET_GLOBAL_VAR;
+	}
 
 	if (canAssign && matchToken(TokenType::T_EQUAL))
 	{
 		expression();
-		emitByte((uint8_t)OPCode::OP_SET_GLOBAL_VAR);
-		emitByte(arg);
+		emitByte((uint8_t)setOperation);
+		emitByte((uint8_t)arg);
 	}
 	else
 	{
-		emitByte((uint8_t)OPCode::OP_GET_GLOBAL_VAR);
-		emitByte(arg);
+		emitByte((uint8_t)getOperation);
+		emitByte((uint8_t)arg);
 	}
 }
 
@@ -315,6 +390,27 @@ uint8_t yo::Compiler::identifierConstant(Token* name)
 {
 	currentChunk->push_constant_only({ name->data });
 	return (uint8_t)currentChunk->constantPool.size() - 1;
+}
+
+int yo::Compiler::resolveLocal(Token name)
+{
+	for (int i = localStack.locals.size() - 1; i >= 0; i--)
+	{
+		LocalVar local = localStack.locals[i];
+		if (name == local.name)
+		{
+			if(local.depth == -1)
+				handleErrorAtCurrentToken("Unable to read local variable in its own initializer.");
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void yo::Compiler::addLocal(Token name)
+{
+	localStack.locals.push_back({name, -1});
 }
 
 std::string yo::Compiler::prepareStringObject() const
@@ -572,4 +668,9 @@ bool yo::Compiler::matchToken(TokenType type)
 	advance();
 
 	return true;
+}
+
+bool yo::Compiler::checkToken(TokenType type)
+{
+	return parser.current.type == type;
 }

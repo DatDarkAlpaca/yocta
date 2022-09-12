@@ -14,6 +14,8 @@ namespace yo
 		static unsigned int simpleInstruction(uint8_t code, int offset);
 
 		static unsigned int constantInstruction(uint8_t code, const Chunk& chunk, int offset);
+
+		static unsigned int byteInstruction(const char* name, const Chunk& chunk, int offset);
 	};
 }
 

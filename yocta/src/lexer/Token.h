@@ -44,8 +44,22 @@ namespace yo
 		Token() = default;
 
 	public:
-		TokenType type;
+		TokenType type = TokenType::T_NONE;
 		std::string data;
-		unsigned int line;
+		unsigned int line = 0;
+
+	public:
+		friend bool operator==(const Token& lhs, const Token& rhs);
 	};
+
+	inline bool operator==(const Token& lhs, const Token& rhs)
+	{
+		if (lhs.type != rhs.type)
+			return false;
+
+		if (lhs.line != rhs.line)
+			return false;
+
+		return lhs.data == rhs.data;
+	}
 }

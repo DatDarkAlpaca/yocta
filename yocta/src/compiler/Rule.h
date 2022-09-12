@@ -15,6 +15,6 @@ namespace yo
 	public:
 		std::function<void(bool)> prefix;
 		std::function<void(bool)> infix;
-		Precedence precedence;
+		Precedence precedence = Precedence::P_NONE;
 	};
 }

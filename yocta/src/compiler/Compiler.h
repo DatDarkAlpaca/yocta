@@ -2,12 +2,13 @@
 #include <unordered_map>
 #include <functional>
 
+#include "YoctaObject.h"
 #include "Precedence.h"
+#include "LocalVar.h"
 #include "Parser.h"
 #include "Lexer.h"
 #include "Chunk.h"
 #include "Rule.h"
-#include "YoctaObject.h"
 
 namespace yo
 {
@@ -37,6 +38,13 @@ namespace yo
 		void grouping();
 
 	private:
+		void startScope();
+
+		void scopeBlock();
+		
+		void endScope();
+
+	private:
 		void statementExpression();
 
 		void statementPrint();
@@ -45,6 +53,10 @@ namespace yo
 		uint8_t parseVariable(const char* message);
 
 		void defineVariable(uint8_t globalVariable);
+
+		void declareVariable();
+
+		void markInitialized();
 
 	private:
 		void synchronize();
@@ -74,6 +86,10 @@ namespace yo
 	private:
 		uint8_t identifierConstant(Token* name);
 
+		int resolveLocal(Token name);
+
+		void addLocal(Token name);
+
 	private:
 		std::string prepareStringObject() const;
 
@@ -90,9 +106,12 @@ namespace yo
 	private:
 		bool matchToken(TokenType type);
 
+		bool checkToken(TokenType type);
+
 	public:
 		Lexer lexer;
 		Parser parser;
+		LocalStack localStack;
 		Chunk* currentChunk = nullptr;
 		YoctaObject* objects = nullptr;
 
