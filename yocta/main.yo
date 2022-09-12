@@ -1,9 +1,11 @@
+var a = 2;
+var b = 3;
+
+if(b > a)
 {
-	var a = 3;
-	a = 4;
-	{
-		var a = 3;
-		print a;
-	}
-	print a;
+	print(b);
+}
+else
+{
+	print(a);
 }

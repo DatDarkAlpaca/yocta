@@ -22,6 +22,8 @@ namespace yo
 
 		Value readConstant(const Chunk& chunk);
 
+		uint8_t readShort();
+
 	private:
 		void binaryOperation(OPCode operation);
 

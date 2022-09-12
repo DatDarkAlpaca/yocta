@@ -49,6 +49,8 @@ namespace yo
 
 		void statementPrint();
 
+		void statementIf();
+
 	private:
 		uint8_t parseVariable(const char* message);
 
@@ -66,6 +68,11 @@ namespace yo
 
 		void emitConstant(Value value);
 
+		int emitJump(uint8_t instruction);
+
+	private:
+		void patchJump(int offset);
+
 	private:
 		void numeric(bool canAssign);
 		
@@ -78,6 +85,28 @@ namespace yo
 		void string(bool canAssign);
 
 		void variable(bool canAssign);
+
+		void andRule(bool canAssign)
+		{
+			int endJump = emitJump((uint8_t)OPCode::OP_JUMP_IF_FALSE);
+
+			emitByte((uint8_t)OPCode::OP_POP_BACK);
+			parsePrecedence(Precedence::P_AND);
+
+			patchJump(endJump);
+		}
+
+		void orRule(bool canAssign)
+		{
+			int elseJump = emitJump((uint8_t)OPCode::OP_JUMP_IF_FALSE);
+			int endJump = emitJump((uint8_t)OPCode::OP_JUMP);
+
+			patchJump(elseJump);
+			emitByte((uint8_t)OPCode::OP_POP_BACK);
+
+			parsePrecedence(Precedence::P_OR);
+			patchJump(endJump);
+		}
 
 		void namedVariable(Token name, bool canAssign);
 

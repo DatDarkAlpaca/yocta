@@ -66,6 +66,8 @@ void yo::Compiler::statement()
 {
 	if (matchToken(TokenType::T_PRINT))
 		statementPrint();
+	else if (matchToken(TokenType::T_IF))
+		statementIf();
 	else if (matchToken(TokenType::T_LEFT_BRACES))
 	{
 		startScope();
@@ -143,11 +145,41 @@ void yo::Compiler::statementExpression()
 
 void yo::Compiler::statementPrint()
 {
+	eat(TokenType::T_LEFT_PARENTHESIS, "Expected a '('");
+
 	expression();
+
+	eat(TokenType::T_RIGHT_PARENTHESIS, "Expected a ')'");
 
 	eat(TokenType::T_SEMICOLON, "Expected ';' after expression");
 
 	emitByte((uint8_t)OPCode::OP_PRINT);
+}
+
+void yo::Compiler::statementIf()
+{
+	eat(TokenType::T_LEFT_PARENTHESIS, "Expected a '('");
+	
+	expression();
+
+	eat(TokenType::T_RIGHT_PARENTHESIS, "Expected a ')'");
+
+	int thenJump = emitJump((uint8_t)OPCode::OP_JUMP_IF_FALSE);
+
+	emitByte((uint8_t)OPCode::OP_POP_BACK);
+
+	statement();
+
+	int elseJump = emitJump((uint8_t)OPCode::OP_JUMP);
+
+	patchJump(thenJump);
+
+	emitByte((uint8_t)OPCode::OP_POP_BACK);
+
+	if (matchToken(TokenType::T_ELSE))
+		statement();
+
+	patchJump(elseJump);
 }
 
 uint8_t yo::Compiler::parseVariable(const char* message)
@@ -229,6 +261,25 @@ void yo::Compiler::emitConstant(Value value)
 {
 	emitByte((uint8_t)OPCode::OP_CONSTANT);
 	currentChunk->push_constant(value, parser.previous.line);
+}
+
+int yo::Compiler::emitJump(uint8_t instruction)
+{
+	emitByte(instruction);
+	emitByte(0xFF);
+	emitByte(0xFF);
+	return currentChunk->data.size() - 2;
+}
+
+void yo::Compiler::patchJump(int offset)
+{
+	int jump = currentChunk->data.size() - offset - 2;
+
+	if (jump > UINT16_MAX)
+		handleErrorAtCurrentToken("The previous jump offset was too large");
+
+	currentChunk->data[offset] = (jump >> 8) & 0xFF;
+	currentChunk->data[offset + 1] = jump & 0xFF;
 }
 
 void yo::Compiler::numeric(bool canAssign)
@@ -540,13 +591,13 @@ void yo::Compiler::intializeParserRules()
 
 	parseRules.insert({
 		TokenType::T_AND,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
+		Rule(nullptr, std::bind(&Compiler::andRule, this, false), Precedence::P_AND)
 	});
 
 	parseRules.insert({
 		TokenType::T_OR,
-		Rule(nullptr, nullptr, Precedence::P_NONE)
-		});
+		Rule(nullptr, std::bind(&Compiler::orRule, this, false), Precedence::P_OR)
+	});
 
 	parseRules.insert({
 		TokenType::T_IF,

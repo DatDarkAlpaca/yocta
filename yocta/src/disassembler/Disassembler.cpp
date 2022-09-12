@@ -80,10 +80,16 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 		return constantInstruction(instruction, chunk, offset);
 
 	case (uint8_t)OPCode::OP_SET_LOCAL_VAR:
-		return byteInstruction("OP_SET_LOCAL", chunk, offset);
+		return byteInstruction(instruction, chunk, offset);
 
 	case (uint8_t)OPCode::OP_GET_LOCAL_VAR:
-		return byteInstruction("OP_GET_LOCAL", chunk, offset);
+		return byteInstruction(instruction, chunk, offset);
+
+	case (uint8_t)OPCode::OP_JUMP:
+		return jumpInstruction(instruction, 1, chunk, offset);
+
+	case (uint8_t)OPCode::OP_JUMP_IF_FALSE:
+		return jumpInstruction(instruction, 1, chunk, offset);
 
 	default:
 		printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction));
@@ -121,9 +127,17 @@ unsigned int yo::Disassembler::constantInstruction(uint8_t code, const Chunk& ch
 	return offset + 1;
 }
 
-unsigned int yo::Disassembler::byteInstruction(const char* name, const Chunk& chunk, int offset)
+unsigned int yo::Disassembler::byteInstruction(uint8_t code, const Chunk& chunk, int offset)
 {
 	uint8_t slot = chunk.data[offset + 1];
-	printf("%-16s %4d\n", name, slot);
+	printf("%-16s %4d\n", translateCode((OPCode)code), slot);
 	return offset + 2;
+}
+
+unsigned int yo::Disassembler::jumpInstruction(uint8_t code, int sign, const Chunk& chunk, int offset)
+{
+	uint16_t jump = (uint16_t)(chunk.data[offset + 1] << 8);
+	jump |= chunk.data[offset + 2];
+	printf("%-16s %4d -> %d\n", translateCode(OPCode(code)), offset, offset + 3 + sign * jump);
+	return offset + 3;
 }

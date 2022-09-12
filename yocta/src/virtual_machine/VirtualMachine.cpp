@@ -193,6 +193,21 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				vmStack[slot] = vmStack.back();
 				break;
 			}
+
+			case (uint8_t)OPCode::OP_JUMP:
+			{
+				uint16_t offset = readShort();
+				IP += offset;
+				break;
+			}
+
+			case (uint8_t)OPCode::OP_JUMP_IF_FALSE:
+			{
+				uint16_t offset = readShort();
+				if (isBooleanFalse(peek(0)))
+					IP += offset;
+				break;
+			}
 		}
 	}
 }
@@ -218,7 +233,7 @@ const yo::Value& yo::VirtualMachine::peek(unsigned int distance) const
 	if (distance > vmStack.size() + 1)
 		throw "Index out of range";
 
-	return vmStack[-1 - distance];
+	return vmStack[vmStack.size() - 1 - distance];
 }
 
 uint8_t yo::VirtualMachine::readByte()
@@ -229,6 +244,11 @@ uint8_t yo::VirtualMachine::readByte()
 yo::Value yo::VirtualMachine::readConstant(const Chunk& chunk)
 {
 	return chunk.constantPool[readByte()];
+}
+
+uint8_t yo::VirtualMachine::readShort()
+{
+	return IP += 2, (uint16_t)((IP[-2] << 8) | IP[-1]);
 }
 
 void yo::VirtualMachine::binaryOperation(OPCode operation)
