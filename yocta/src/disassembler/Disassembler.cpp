@@ -7,8 +7,6 @@ void yo::Disassembler::disassemble(const Chunk& array, const char* instructionSe
 
 	for (unsigned int offset = 0; offset < array.data.size();)
 		offset = disassembleInstruction(array, offset);
-
-	printf("\n");
 }
 
 unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int offset)
@@ -21,6 +19,9 @@ unsigned int yo::Disassembler::disassembleInstruction(const Chunk& chunk, int of
 
 	switch (instruction)
 	{
+	case (uint8_t)OPCode::None:
+		return simpleInstruction(instruction, offset);
+
 	case (uint8_t)OPCode::OP_RETURN:
 		return simpleInstruction(instruction, offset);
 

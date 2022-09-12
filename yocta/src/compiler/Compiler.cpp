@@ -90,7 +90,7 @@ void yo::Compiler::finish()
 {
 	emitByte((uint8_t)OPCode::OP_RETURN);
 
-	#ifdef DEBUG_PRINT_SOURCE
+	#ifdef DEBUG_COMPILER_TRACE
 	if (!parser.errorFound)
 		Disassembler::disassemble(*currentChunk, "Compiler");
 	#endif
@@ -236,7 +236,6 @@ void yo::Compiler::binary(bool canAssign)
 		emitByte((uint8_t)OPCode::OP_GREATER);
 		emitByte((uint8_t)OPCode::OP_NOT);
 		break;
-
 	}
 }
 
@@ -292,8 +291,9 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 
 uint8_t yo::Compiler::identifierConstant(Token* name)
 {
-	currentChunk->push_constant({ name->data }, parser.previous.line);
-	return currentChunk->data.back();
+	//return makeConstant(name);
+	currentChunk->push_constant_only({ name->data });
+	return (uint8_t)currentChunk->constantPool.size() - 1;
 }
 
 std::string yo::Compiler::prepareStringObject() const

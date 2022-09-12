@@ -2,7 +2,7 @@
 
 yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 {
-	#ifdef DEBUG_TRACE
+	#ifdef DEBUG_VM_INSTRUCTION_TRACE
 	printf("-=-= Disassembly : Interpreter =-=-\n");
 	#endif
 
@@ -11,7 +11,6 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 
 	while (true)
 	{
-		#ifdef DEBUG_TRACE
 		#ifdef DEBUG_VM_STACK_TRACE
 		printf("Stack: %s", vmStack.empty() ? "[]" : "");
 		
@@ -23,6 +22,8 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 		}
 		printf("\n");
 		#endif
+
+		#ifdef DEBUG_VM_INSTRUCTION_TRACE
 		Disassembler::disassembleInstruction(*compiler.currentChunk, (int)(IP - chunk->data.data()));
 		#endif
 

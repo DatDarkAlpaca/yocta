@@ -1,2 +1,1 @@
-var a = true;
-print a == false;
+var a = 1;

@@ -95,8 +95,6 @@ namespace yo
 	private:
 		std::string prepareStringObject() const;
 
-		StringObject* allocateStringObject(const std::string& str);
-
 	private:
 		void intializeParserRules();
 

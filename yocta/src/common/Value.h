@@ -98,6 +98,9 @@ namespace yo
 		if (lhs.type != rhs.type)
 			return {};
 
+		if (lhs.type == ValueType::VT_NONE || rhs.type == ValueType::VT_NONE)
+			return {};
+
 		if (lhs.variantValue.index() == 1)
 		{
 			double a = std::get<double>(lhs.variantValue);
