@@ -77,25 +77,25 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				Value back = vmStack.back();
 				vmStack.pop_back();
 
-				vmStack.push_back({ ValueType::VT_BOOL, isBooleanFalse(back) });
+				vmStack.push_back({ isBooleanFalse(back) });
 				break;
 			}
 
 			case (uint8_t)OPCode::OP_NONE:
 			{
-				vmStack.push_back({ValueType::VT_NONE, 0.});
+				vmStack.push_back({});
 				break;
 			}
 
 			case (uint8_t)OPCode::OP_TRUE:
 			{
-				vmStack.push_back({ ValueType::VT_BOOL, true });
+				vmStack.push_back({ true });
 				break;
 			}
 
 			case (uint8_t)OPCode::OP_FALSE:
 			{
-				vmStack.push_back({ ValueType::VT_BOOL, false });
+				vmStack.push_back({ false });
 				break;
 			}
 
@@ -107,7 +107,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 				Value a = vmStack.back();
 				vmStack.pop_back();
 
-				vmStack.push_back({ ValueType::VT_BOOL, a == b });
+				vmStack.push_back({ a == b });
 				break;
 			}
 
@@ -139,6 +139,12 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 			case (uint8_t)OPCode::OP_DEFINE_GLOBAL_VAR:
 			{
 				StringObject* name = getStringObject(chunk->constantPool[readByte()]);
+				if (vmGlobals.find(name->data) != vmGlobals.end())
+				{
+					runtimeError("Variable '%s' is already defined.\n", name->data.c_str());
+					return InterpretResult::RUNTIME_ERROR;
+				}
+
 				vmGlobals[name->data] = vmStack.back();
 				vmStack.pop_back();
 				break;
@@ -151,7 +157,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 
 				if (vmGlobals.find(name->data) == vmGlobals.end())
 				{
-					// HANDLE RUNTIME EXCEPTIONS
+					runtimeError("Undefined variable '%s'.\n", name->data.c_str());
 					return InterpretResult::RUNTIME_ERROR;
 				}
 
@@ -213,8 +219,10 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 	switch (operation)
 	{
 	case OPCode::OP_ADD:
+	{
 		vmStack.push_back(a + b);
 		break;
+	}
 
 	case OPCode::OP_SUB:
 		vmStack.push_back(a - b);
@@ -229,11 +237,11 @@ void yo::VirtualMachine::binaryOperation(OPCode operation)
 		break;
 
 	case OPCode::OP_GREATER:
-		vmStack.push_back({ ValueType::VT_BOOL, a > b });
+		vmStack.push_back({ a > b });
 		break;
 
 	case OPCode::OP_LESS:
-		vmStack.push_back({ ValueType::VT_BOOL, a < b });
+		vmStack.push_back({ a < b });
 		break;
 	}
 }

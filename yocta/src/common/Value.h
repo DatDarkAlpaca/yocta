@@ -22,8 +22,23 @@ namespace yo
 	struct Value
 	{
 	public:
-		ValueType type;
-		std::variant<bool, double, YoctaObject*> variantValue;
+		Value() = default;
+
+		Value(YoctaObject* object)
+			: type(ValueType::VT_OBJECT), variantValue(object) { }
+
+		Value(bool boolean)
+			: type(ValueType::VT_BOOL), variantValue(boolean) { }
+
+		Value(double number)
+			: type(ValueType::VT_NUMERIC), variantValue(number) { }
+
+		Value(const std::string& str)
+			: type(ValueType::VT_OBJECT), variantValue(new StringObject(str)) { }
+
+	public:
+		ValueType type = ValueType::VT_NONE;
+		std::variant<bool, double, YoctaObject*> variantValue = false;
 
 	public:
 		friend const Value& operator-(const Value& lhs);
@@ -75,8 +90,7 @@ namespace yo
 	inline const Value& operator-(const Value& lhs)
 	{
 		double a = std::get<double>(lhs.variantValue);
-		std::variant<bool, double, YoctaObject*> v(-a);
-		return { lhs.type, v };
+		return { -a };
 	}
 
 	inline const Value& operator+(const Value& lhs, const Value& rhs)
@@ -89,8 +103,7 @@ namespace yo
 			double a = std::get<double>(lhs.variantValue);
 			double b = std::get<double>(rhs.variantValue);
 
-			std::variant<bool, double, YoctaObject*>v(a + b);
-			return { lhs.type, v };
+			return { a + b };
 		}
 		else if (lhs.variantValue.index() == 2)
 		{
@@ -98,9 +111,7 @@ namespace yo
 			std::string b = getStringObject(rhs)->data;
 
 			std::string c = a.append(b);
-
-			std::variant<bool, double, YoctaObject*>v((YoctaObject*)(new StringObject(c)));
-			return { lhs.type, v };
+			return { c };
 		}
 	}
 
@@ -109,8 +120,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double, YoctaObject*> v(a - b);
-		return { lhs.type, v };
+		return { a - b };
 	}
 
 	inline const Value& operator*(const Value& lhs, const Value& rhs)
@@ -118,8 +128,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double, YoctaObject*> v(a * b);
-		return { lhs.type, v };
+		return { a * b };
 	}
 
 	inline const Value& operator/(const Value& lhs, const Value& rhs)
@@ -127,8 +136,7 @@ namespace yo
 		double a = std::get<double>(lhs.variantValue);
 		double b = std::get<double>(rhs.variantValue);
 
-		std::variant<bool, double, YoctaObject*> v(a / b);
-		return { lhs.type, v };
+		return { a / b };
 	}
 
 	inline const bool operator==(const Value& lhs, const Value& rhs)

@@ -172,7 +172,7 @@ void yo::Compiler::emitConstant(Value value)
 void yo::Compiler::numeric(bool canAssign)
 {
 	double value = std::strtod(parser.previous.data.c_str(), NULL);
-	emitConstant({ ValueType::VT_NUMERIC, value });
+	emitConstant({ value });
 }
 
 void yo::Compiler::unary(bool canAssign)
@@ -260,7 +260,7 @@ void yo::Compiler::string(bool canAssign)
 {
 	std::string str = prepareStringObject();
 
-	emitConstant({ ValueType::VT_OBJECT, (YoctaObject*)(allocateStringObject(str)) });
+	emitConstant({ str });
 }
 
 void yo::Compiler::parsePrecedence(const Precedence& precendece)
@@ -292,7 +292,7 @@ void yo::Compiler::parsePrecedence(const Precedence& precendece)
 
 uint8_t yo::Compiler::identifierConstant(Token* name)
 {
-	emitConstant({ValueType::VT_OBJECT, (YoctaObject*)(allocateStringObject(name->data)) });
+	currentChunk->push_constant({ name->data }, parser.previous.line);
 	return currentChunk->data.back();
 }
 
@@ -304,10 +304,10 @@ std::string yo::Compiler::prepareStringObject() const
 	return str;
 }
 
-yo::StringObject* yo::Compiler::allocateStringObject(const std::string& str)
-{
-	return new StringObject(str);
-}
+//yo::StringObject* yo::Compiler::allocateStringObject(const std::string& str)
+//{
+//	return new StringObject(str);
+//}
 
 void yo::Compiler::intializeParserRules()
 {
