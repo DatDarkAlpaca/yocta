@@ -165,7 +165,7 @@ yo::VirtualMachine::InterpretResult yo::VirtualMachine::run()
 
 				if (vmGlobals.find(name->data) == vmGlobals.end())
 				{
-					// HANDLE RUNTIME EXCEPTIONS
+					runtimeError("Undefined variable '%s'.\n", name->data.c_str());
 					return InterpretResult::RUNTIME_ERROR;
 				}
 

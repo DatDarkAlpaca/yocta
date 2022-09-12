@@ -30,6 +30,25 @@ namespace yo
 		void binaryOperation(OPCode operation);
 
 	private:
+		template <class X>
+		using is_not_string = typename std::enable_if<!std::is_same<X, std::string>::value>::type;
+
+		template <class T, class = is_not_string<T>>
+		constexpr T forward_or_transform(T t) 
+		{
+			return std::forward<T>(t);
+		}
+
+		template<typename... Values>
+		void runtimeError(const char* format, Values... value)
+		{
+			// TODO: calculate instruction number.
+			size_t instruction = 1;
+			printf("<Line %d> ", compiler.currentChunk->lines[instruction]);
+			printf(format, forward_or_transform(value)...);
+		}
+
+	private:
 		inline bool isBooleanFalse(const Value& value) const
 		{
 			return value.type == ValueType::VT_NONE || (value.type == ValueType::VT_BOOL && !std::get<bool>(value.variantValue));
