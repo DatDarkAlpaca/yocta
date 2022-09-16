@@ -18,19 +18,13 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\disassembler\Disassembler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\common\chunk\Chunk.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\compiler\Compiler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\lexer\Lexer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\virtual_machine\VirtualMachine.cpp">
+    <ClCompile Include="src\parser\Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compiler\Compiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -39,25 +33,10 @@
     <None Include="main.yo" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\common\chunk\Chunk.h">
+    <ClInclude Include="src\common\YoctaValue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\disassembler\Disassembler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\Value.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\OperationCodes.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\virtual_machine\VirtualMachine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\common\StringHelper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\compiler\Compiler.h">
+    <ClInclude Include="src\compiler\OperationCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lexer\Lexer.h">
@@ -66,22 +45,46 @@
     <ClInclude Include="src\lexer\Token.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\Parser.h">
+    <ClInclude Include="src\parser\Precedence.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\Precedence.h">
+    <ClInclude Include="src\parser\Rule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\Rule.h">
+    <ClInclude Include="src\common\LookupTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lexer\ReservedToken.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\InputStream.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\common\Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\common\Debug.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\common\YoctaObject.h">
+    <ClInclude Include="src\parser\Parser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\LocalVar.h">
+    <ClInclude Include="src\parser\Expression.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\disassembler\parserDisassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\disassembler\lexerDisassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compiler\Compiler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\compiler\instruction_set\InstructionSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\disassembler\compilerDisassembler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

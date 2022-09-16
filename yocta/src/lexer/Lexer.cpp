@@ -1,222 +1,505 @@
-#include "Lexer.h"
+#include <optional>
 #include <string>
 
-yo::Lexer::Lexer(const char* source)
-	: m_Source(source)
+#include "ReservedToken.h"
+#include "Lexer.h"
+#include "Error.h"
+
+namespace
 {
-}
+	enum class CharacterType { END_OF_FILE = 0, WHITESPACE, ALPHA, NUMERIC, PUNCTUATION, INVALID = -1 };
 
-void yo::Lexer::open(const char* source)
-{
-	m_Source = source;
-}
-
-yo::Token yo::Lexer::nextToken()
-{
-	while (std::isspace(peek()))
-		nextCharacter();
-
-	if (peek() == '/')
-		handleComments();
-
-	if (peek() == '\0')
-		return createToken("\0", TokenType::T_EOF);
-
-	if (std::isalpha(peek()))
-		return handleIdentifier();
-
-	if (std::isdigit(peek()))
-		return handleNumeric();
-
-	if (peek() == '"')
-		return handleString();
-
-	if (validSymbol(peek()))
-		return handleSymbol(peek());
-
-	return createErrorToken("Unexpected token");
-}
-
-yo::Token yo::Lexer::handleNumeric()
-{
-	const char* start = m_Source;
-
-	nextCharacter();
-	while (std::isdigit(peek()))
-		nextCharacter();
-
-	std::string tokenData;
-	tokenData.assign(start, m_Source - start);
-
-	return createToken(tokenData, TokenType::T_NUMERIC);
-}
-
-yo::Token yo::Lexer::handleIdentifier()
-{
-	const char* start = m_Source;
-
-	nextCharacter();
-
-	while (validIdentifier(peek()))
-		nextCharacter();
-
-	std::string tokenData;
-	tokenData.assign(start, m_Source - start);
-
-	return createToken(tokenData, getIdentifierType(tokenData));
-}
-
-yo::Token yo::Lexer::handleSymbol(char symbol)
-{
-	nextCharacter();
-
-	switch (symbol)
+	CharacterType getCharacterType(int character)
 	{
-		case '(': return createToken("(", TokenType::T_LEFT_PARENTHESIS);
-		case ')': return createToken(")", TokenType::T_RIGHT_PARENTHESIS);
-		case '[': return createToken("[", TokenType::T_LEFT_BRACKETS);
-		case ']': return createToken("]", TokenType::T_RIGHT_BRACKETS);
-		case '{': return createToken("{", TokenType::T_LEFT_BRACES);
-		case '}': return createToken("}", TokenType::T_RIGHT_BRACES);
+		if (character == EOF)
+			return CharacterType::END_OF_FILE;
 
-		case ';': return createToken(";", TokenType::T_SEMICOLON);
-		case '.': return createToken(".", TokenType::T_DOT);
-		case ',': return createToken(",", TokenType::T_COMMA);
+		else if (std::isspace(character))
+			return CharacterType::WHITESPACE;
 
-		case '+': return createToken("+", TokenType::T_PLUS);
-		case '-': return createToken("-", TokenType::T_MINUS);
-		case '*': return createToken("*", TokenType::T_ASTERISTIC);
-		case '/': return createToken("/", TokenType::T_SLASH);
+		else if (character == '_' || std::isalpha(character))
+			return CharacterType::ALPHA;
 
-		case '&': 
+		else if (std::isdigit(character))
+			return CharacterType::NUMERIC;
+
+		else if (std::ispunct(character))
+			return CharacterType::PUNCTUATION;
+
+		return CharacterType::INVALID;
+	}
+}
+
+namespace 
+{
+	std::optional<yo::ReservedToken> fetchKeyword(std::string_view word)
+	{
+		auto it = yo::keywordTokenTable.find(word);
+		return it == yo::keywordTokenTable.end() ? std::nullopt : std::make_optional(it->second);
+	}
+
+	std::optional<yo::ReservedToken> fetchToken(std::string_view word)
+	{
+		auto it = yo::operatorTokenTable.find(word);
+		return it == yo::operatorTokenTable.end() ? std::nullopt : std::make_optional(it->second);
+	}
+}
+
+namespace 
+{
+	yo::Token handleIdentifier(yo::InputStream& stream)
+	{
+		using namespace yo;
+		size_t lineNumber = stream.getLineNumber();
+		size_t charIndex = stream.getCharIndex();
+		std::string identifier;
+
+		int character = stream.popCharacter();
+		do
 		{
-			TokenType type = matchesNext('&') ? TokenType::T_AND : TokenType::T_AMPERSTAND;
-			const char* symbol = matchesNext('&') ? "&&" : "&";
-			nextCharacter();
-			return createToken(symbol, type);
+			identifier += (char)character;
+			character = stream.popCharacter();
+		} while (std::isalnum(character) || character == '_');
+
+		stream.pushCharacter(character);
+
+		if (auto token = fetchKeyword(identifier))
+			return Token({ token.value() }, lineNumber, charIndex);
+		else
+			return Token({ Identifier(identifier) }, lineNumber, charIndex);
+	}
+
+	yo::Token handleNumber(yo::InputStream& stream)
+	{
+		using namespace yo;
+
+		size_t lineNumber = stream.getLineNumber();
+		size_t charIndex = stream.getCharIndex();
+		std::string number;
+
+		int character = stream.popCharacter();
+		do
+		{
+			number += (char)character;
+			character = stream.popCharacter();
+		} while (std::isdigit(character) || character == '.');
+
+		stream.pushCharacter(character);
+
+		double numberValue = std::atof(number.c_str());
+
+		return Token({ numberValue }, lineNumber, charIndex);
+	}
+
+	yo::Token handleString(yo::InputStream& stream)
+	{
+		using namespace yo;
+
+		size_t lineNumber = stream.getLineNumber();
+		size_t charIndex = stream.getCharIndex();
+		std::string string;
+
+		int character = stream.popCharacter();
+		do
+		{
+			string += (char)character;
+
+			if (character == '\n')
+				lineNumber++;
+
+			character = stream.popCharacter();
+
+		} while (character != '"' && getCharacterType(character) != CharacterType::END_OF_FILE);
+
+		if (character != '"')
+		{
+			stream.pushCharacter(character);
+			throw new LexingError("Missing close quote", stream.getLineNumber(), stream.getCharIndex());
 		}
 
-		case '|': 
+		return Token({ string }, lineNumber, charIndex);
+	}
+
+	yo::Token handleOperator(yo::InputStream& stream)
+	{
+		using namespace yo;
+
+		size_t lineNumber = stream.getLineNumber();
+		size_t charIndex = stream.getCharIndex();
+
+		ReservedToken reserved = ReservedToken::T_NONE;
+		switch (stream.popCharacter())
 		{
-			TokenType type = matchesNext('|') ? TokenType::T_OR : TokenType::T_PIPE;
-			const char* symbol = matchesNext('|') ? "||" : "|";
-			nextCharacter();
-			return createToken(symbol, type);
+		case '+':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '+')
+				reserved = ReservedToken::T_INCREMENT;
+			else if (next == '=')
+				reserved = ReservedToken::T_ADD_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_ADD;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '-':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '-')
+				reserved = ReservedToken::T_DECREMENT;
+			else if (next == '=')
+				reserved = ReservedToken::T_SUB_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_SUB;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '*':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_MULT_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_MULT;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '/':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_DIV_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_DIV;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '%':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_MOD_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_MOD;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '~':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_BITNOT_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_BITNOT;
+				stream.pushCharacter(next);
+			}
+
+			break;
 		}
 
 		case '!':
 		{
-			TokenType type = matchesNext('=') ? TokenType::T_EXCLAMATION_EQUAL : TokenType::T_EXCLAMATION;
-			const char* symbol = matchesNext('=') ? "!=" : "!";
-			nextCharacter();
-			return createToken(symbol, type);
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_NOT_EQUALS;
+			else
+			{
+				stream.pushCharacter(next);
+				reserved = ReservedToken::T_NOT;
+			}
+			break;
 		}
 
-		case '=':
+		case '&':
 		{
-			TokenType type = matchesNext('=') ? TokenType::T_EQUAL_EQUAL : TokenType::T_EQUAL;
-			const char* symbol = matchesNext('=') ? "==" : "=";
-			nextCharacter();
-			return createToken(symbol, type);
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_BITAND_ASSIGN;
+			else if (next == '&')
+				reserved = ReservedToken::T_AND;
+			else
+			{
+				reserved = ReservedToken::T_BITAND;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '|':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_BITOR_ASSIGN;
+			if (next == '|')
+				reserved = ReservedToken::T_OR;
+			else
+			{
+				reserved = ReservedToken::T_BITOR;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '^':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_BITXOR_ASSIGN;
+			else
+			{
+				reserved = ReservedToken::T_BITXOR;
+				stream.pushCharacter(next);
+			}
+
+			break;
+		}
+
+		case '<':
+		{
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_LESS_EQUALS;
+			else if (next == '<')
+			{
+				int attach = stream.popCharacter();
+
+				if (attach == '=')
+					reserved = ReservedToken::T_BITSHIFT_LEFT_ASSIGN;
+				else
+				{
+					reserved = ReservedToken::T_BITSHIFT_LEFT;
+					stream.pushCharacter(attach);
+				}
+			}
+			else
+			{
+				reserved = ReservedToken::T_LESS_THAN;
+				stream.pushCharacter(next);
+			}
+
+			break;
 		}
 
 		case '>':
 		{
-			TokenType type = matchesNext('=') ? TokenType::T_GREATER_EQUAL : TokenType::T_GREATER;
-			const char* symbol = matchesNext('=') ? ">=" : ">";
-			nextCharacter();
-			return createToken(symbol, type);
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_GREATER_EQUALS;
+			else if (next == '>')
+			{
+				int attach = stream.popCharacter();
+
+				if (attach == '=')
+					reserved = ReservedToken::T_BITSHIFT_RIGHT_ASSIGN;
+				else
+				{
+					reserved = ReservedToken::T_BITSHIFT_RIGHT;
+					stream.pushCharacter(attach);
+				}
+			}
+			else
+			{
+				reserved = ReservedToken::T_GREATER_THAN;
+				stream.pushCharacter(next);
+			}
+
+			break;
 		}
-		case '<':
+
+		case '=':
 		{
-			TokenType type = matchesNext('=') ? TokenType::T_LESS_EQUAL : TokenType::T_LESS;
-			const char* symbol = matchesNext('=') ? "<=" : "<";
-			nextCharacter();
-			return createToken(symbol, type);
+			int next = stream.popCharacter();
+
+			if (next == '=')
+				reserved = ReservedToken::T_EQUALS;
+			else
+			{
+				stream.pushCharacter(next);
+				reserved = ReservedToken::T_ASSIGN;
+			}
+			break;
+		}
+
+		case '(':
+			reserved = ReservedToken::T_OPEN_PARENTHESIS;
+			break;
+		case ')':
+			reserved = ReservedToken::T_CLOSE_PARENTHESIS;
+			break;
+		case '[':
+			reserved = ReservedToken::T_OPEN_BRACKETS;
+			break;
+		case ']':
+			reserved = ReservedToken::T_CLOSE_BRACKETS;
+			break;
+		case '{':
+			reserved = ReservedToken::T_OPEN_BRACES;
+			break;
+		case '}':
+			reserved = ReservedToken::T_CLOSE_BRACES;
+			break;
+		case '?':
+			reserved = ReservedToken::T_QUESTION_MARK;
+			break;
+		case ':':
+			reserved = ReservedToken::T_COLON;
+			break;
+		case ';':
+			reserved = ReservedToken::T_SEMICOLON;
+			break;
+		case ',':
+			reserved = ReservedToken::T_COMMA;
+			break;
+		case '.':
+			reserved = ReservedToken::T_DOT;
+			break;
+
+		default:
+			reserved = ReservedToken::T_NONE;
+			break;
+		}
+
+		if (reserved != ReservedToken::T_NONE)
+			return Token({ reserved }, lineNumber, charIndex);
+
+		throw new LexingError("Unexpected token", lineNumber, charIndex);
+		return {};
+	}
+
+	void handleInlineComment(yo::InputStream& stream)
+	{
+		auto isEOFCharacter = [](char character) -> bool {
+			return character == '\n' || getCharacterType(character) == CharacterType::END_OF_FILE;
+		};
+
+		int character;
+		do
+		{
+			character = stream.popCharacter();
+		} while (!isEOFCharacter(character));
+
+		if (character != '\n')
+			stream.pushCharacter(character);
+	}
+
+	void handleBlockComment(yo::InputStream& stream)
+	{
+		using namespace yo;
+
+		auto isEOFCharacter = [](char character) -> bool {
+			return getCharacterType(character) == CharacterType::END_OF_FILE;
+		};
+
+		bool close = false;
+		int character;
+
+		do
+		{
+			character = stream.popCharacter();
+			if (close && character == '/')
+				return;
+
+			close = (character == '*');
+
+		} while (!isEOFCharacter(character));
+
+		stream.pushCharacter(character);
+		throw LexingError("Missing closing quote", stream.getLineNumber(), stream.getCharIndex());
+	}
+}
+
+yo::Token yo::lex(yo::InputStream& stream)
+{
+	while (true)
+	{
+		int character = stream.popCharacter();
+
+		switch (getCharacterType(character))
+		{
+			case CharacterType::END_OF_FILE:
+			{
+				size_t lineNumber = stream.getLineNumber();
+				size_t charIndex = stream.getCharIndex();
+				return { { yo::END_OF_FILE() }, lineNumber, charIndex };
+			}
+
+			case CharacterType::WHITESPACE:
+				continue;
+
+			case CharacterType::ALPHA:
+				stream.pushCharacter(character);
+				return handleIdentifier(stream);
+
+			case CharacterType::NUMERIC:
+				stream.pushCharacter(character);
+				return handleNumber(stream);
+
+			case CharacterType::PUNCTUATION:
+			{
+				switch (character)
+				{
+				case '"':
+					return handleString(stream);
+
+				case '/':
+				{
+					char nextCharacter = stream.popCharacter();
+					switch (nextCharacter)
+					{
+						case '/':
+							handleInlineComment(stream);
+							continue;
+
+						case '*':
+							handleBlockComment(stream);
+							continue;
+
+						default:
+							stream.pushCharacter(nextCharacter);
+					}
+				}
+
+				default:
+					stream.pushCharacter(character);
+					return handleOperator(stream);
+				}
+				break;
+			}
 		}
 	}
-
-	return createErrorToken("Undefined symbol");
-}
-
-yo::Token yo::Lexer::handleString()
-{
-	nextCharacter();
-
-	const char* start = m_Source;
-	while (peek() != '"' && peek() != '\0')
-	{
-		if (peek() == '\n')
-			m_Line++;
-
-		nextCharacter();
-	}
-
-	if (peek() == '\0')
-		return createErrorToken("Missing close quote");
-
-	std::string tokenString;
-	tokenString.assign(start, m_Source - start);
-
-	nextCharacter();
-
-	return { tokenString, TokenType::T_STRING, m_Line };
-}
-
-void yo::Lexer::handleComments()
-{
-	bool isMultiline = false;
-	nextCharacter();
-
-	if (peek() == '/')
-	{
-		while (peek() != '\n')
-			nextCharacter();
-
-		nextCharacter();
-
-		if (peek() == '/')
-			handleComments();
-	}
-	else if (peek() == '*')
-	{
-		isMultiline = true;
-		nextCharacter();
-		while (peek() != '*' && peek(1) != '/')
-			nextCharacter();
-		nextCharacter();
-	}
-
-	if (isMultiline)
-	{
-		nextCharacter();
-		nextCharacter();
-	}
-}
-
-bool yo::Lexer::validSymbol(char symbol) const
-{
-	// TODO: optimize using binary search and a sorted list of symbols.
-	return std::find(m_ValidSymbols.begin(), m_ValidSymbols.end(), symbol) != m_ValidSymbols.end();
-}
-
-bool yo::Lexer::validIdentifier(char symbol) const
-{
-	return std::isalnum(symbol) || symbol == '_';
-}
-
-bool yo::Lexer::matchesNext(char expected)
-{
-	if (*m_Source == '\0')
-		return false;
-
-	return peek() == expected;
-}
-
-yo::TokenType yo::Lexer::getIdentifierType(const std::string& identifier) const
-{
-	if (identifierTable.find(identifier) == identifierTable.end())
-		return TokenType::T_IDENTIFIER;
-
-	return identifierTable[identifier];
 }

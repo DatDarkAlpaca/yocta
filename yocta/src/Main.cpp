@@ -1,66 +1,32 @@
-#include <cstdio>
-#include <fstream>
+#include <iostream>
 #include <sstream>
 
-#include "VirtualMachine.h"
+#include "InputStream.h"
+#include "Compiler.h"
+#include "Parser.h"
 
-void inlineInterpreter()
+#include "Debug.h"
+
+#include "compilerDisassembler.h"
+#include "parserDisassembler.h"
+
+int main()
 {
-	yo::VirtualMachine vm;
+	using namespace yo;
 
-	while (true)
-	{
-		printf("> ");
+	std::string_view input = "(1 - 5 * (2 + 3));\ntrue;";
+	InputStream stream(input);
 
-		char line[1024];
-		if (!fgets(line, sizeof(line), stdin)) 
-		{
-			printf("\n");
-			return;
-		}
+	Parser parser(stream);
+	auto expressions = parser.parse();
 
-		vm.interpret(line);
-	}
-}
+#ifdef DEBUG_PARSER_TRACE
+	disassembleParser(expressions);
+	printf("\n");
+#endif
 
-static std::string readFile(const char* filepath)
-{
-	std::ifstream file(filepath);
+	Compiler compiler(expressions);
+	InstructionSet set = compiler.compile();
 
-	if (!file.good())
-	{
-		fprintf(stderr, "An error has occurred while opening the source file.");
-		exit(1);
-	}
-
-	std::stringstream stringBuffer;
-	stringBuffer << file.rdbuf();
-
-	return stringBuffer.str();
-}
-
-void runFile(const char* filepath)
-{
-	yo::VirtualMachine vm;
-
-	std::string src = readFile(filepath);
-
-	vm.interpret(src.c_str());
-}
-
-int main(int argc, char** argv)
-{
-	if (argc == 1)
-		inlineInterpreter();
-	
-	else if (argc == 2)
-		runFile(argv[1]);
-
-	else
-	{
-		fprintf(stderr, "Usage: yocta <filepath>\n");
-		return 1;
-	}
-	
-	return 0;
+	disassembleInstructionSet(set);
 }
