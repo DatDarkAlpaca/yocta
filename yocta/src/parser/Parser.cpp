@@ -25,7 +25,25 @@ std::vector<yo::Expression> yo::Parser::parse()
 
 void yo::Parser::declaration()
 {
-	statement();
+	if (matchesToken(ReservedToken::T_VAR))
+		variableDeclaration();
+	else
+		statement();
+}
+
+void yo::Parser::variableDeclaration()
+{
+	consumeIdentifier("Expected variable name");
+	std::string variableName = m_PreviousToken.getValue().getIdentifier().name;
+
+	if (matchesToken(ReservedToken::T_ASSIGN))
+		expression();
+	else
+		m_Results.push_back({ ExpressionType::EXPR_CONSTANT, { NULL_TYPE()} });
+
+	consumeToken(ReservedToken::T_SEMICOLON, "Expected ';'");
+
+	m_Results.push_back({ ExpressionType::EXPR_DEF_GLOBAL_VAR, variableName });
 }
 
 void yo::Parser::statement()
@@ -107,6 +125,19 @@ void yo::Parser::handleGrouping()
 	consumeToken({ ReservedToken::T_CLOSE_PARENTHESIS }, "Missing ')'");
 }
 
+void yo::Parser::handleVariable()
+{
+	std::string arg = m_PreviousToken.getValue().getIdentifier().name;
+
+	if (matchesToken(ReservedToken::T_ASSIGN))
+	{
+		expression();
+		m_Results.push_back({ ExpressionType::EXPR_SET_GLOBAL_VAR, arg });
+	}
+	else
+		m_Results.push_back({ ExpressionType::EXPR_GET_GLOBAL_VAR, arg });
+}
+
 void yo::Parser::handleUnary()
 {
 	YoctaValue unaryOperator = m_PreviousToken.getValue();
@@ -180,13 +211,21 @@ void yo::Parser::consumeToken(ReservedToken token, std::string errorMessage)
 	throw new ParserError(errorMessage, m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 }
 
+void yo::Parser::consumeIdentifier(std::string errorMessage)
+{
+	if (!m_CurrentToken.getValue().isIdentifier())
+		throw "Invalid identifier";
+
+	advance();
+}
+
 yo::Rule yo::Parser::getRule(YoctaValue value)
 {
 	if (value.isReservedToken())
 		return reservedRules.at(value.getReservedToken());
 
 	else if (value.isIdentifier())
-		return { };
+		return { std::bind(&Parser::handleVariable, this), nullptr, Precedence::P_NONE };
 
 	else if (value.isString())
 		return { std::bind(&Parser::handleString, this), nullptr, Precedence::P_NONE };

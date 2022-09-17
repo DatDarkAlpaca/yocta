@@ -28,16 +28,34 @@ void yo::Compiler::handleExpression(const Expression& expression)
 
 		case ExpressionType::EXPR_POP:
 			return m_Instructions.push_instruction(OPCode::OP_POP);
+
+		case ExpressionType::EXPR_DEF_GLOBAL_VAR:
+			m_Instructions.push_instruction(OPCode::OP_DEFINE_GLOBAL);
+			m_Instructions.push_value(expression.value);
+			break;
+
+		case ExpressionType::EXPR_GET_GLOBAL_VAR:
+			m_Instructions.push_instruction(OPCode::OP_GET_GLOBAL);
+			m_Instructions.push_value(expression.value);
+			break;
+
+		case ExpressionType::EXPR_SET_GLOBAL_VAR:
+			m_Instructions.push_instruction(OPCode::OP_SET_GLOBAL);
+			m_Instructions.push_value(expression.value);
+			break;
 	}
 }
 
 void yo::Compiler::handleConstants(YoctaValue value)
 {
 	if (value.isNumber())
-		m_Instructions.push_number(value.getNumber());
+		m_Instructions.push_number_literal(value.getNumber());
 
 	else if(value.isBool())
-		m_Instructions.push_bool(value.getBool());
+		m_Instructions.push_bool_literal(value.getBool());
+
+	else if (value.isNull())
+		m_Instructions.push_null_literal(value.getNull());
 }
 
 void yo::Compiler::handleOperations(YoctaValue value)

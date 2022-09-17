@@ -41,6 +41,15 @@ namespace yo
 			case OPCode::OP_POP:
 				return simpleInstruction(OPCode::OP_POP, offset);
 
+			case OPCode::OP_DEFINE_GLOBAL:
+				return constantInstruction(OPCode::OP_DEFINE_GLOBAL, set, offset);
+
+			case OPCode::OP_SET_GLOBAL:
+				return constantInstruction(OPCode::OP_SET_GLOBAL, set, offset);
+
+			case OPCode::OP_GET_GLOBAL:
+				return constantInstruction(OPCode::OP_GET_GLOBAL, set, offset);
+				
 			case OPCode::OP_ADD:
 				return simpleInstruction(OPCode::OP_ADD, offset);
 

@@ -10,6 +10,10 @@ namespace yo
 		OP_PUSH_LITERAL,
 		OP_POP,
 
+		OP_DEFINE_GLOBAL,
+		OP_GET_GLOBAL,
+		OP_SET_GLOBAL,
+
 		OP_ADD,
 		OP_SUB,
 		OP_MULT,
@@ -34,6 +38,15 @@ namespace yo
 
 			case OPCode::OP_POP:
 				return "POP";
+
+			case OPCode::OP_DEFINE_GLOBAL:
+				return "DEF_GL";
+
+			case OPCode::OP_GET_GLOBAL:
+				return "GET_GL";
+
+			case OPCode::OP_SET_GLOBAL:
+				return "SET_GL";
 
 			case OPCode::OP_ADD:
 				return "ADD";

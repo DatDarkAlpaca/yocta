@@ -20,6 +20,8 @@ namespace yo
 	private:
 		void declaration();
 
+		void variableDeclaration();
+
 		void statement();
 
 		void printStatement();
@@ -38,6 +40,8 @@ namespace yo
 	private:
 		void handleGrouping();
 
+		void handleVariable();
+
 		void handleUnary();
 
 		void handleBinary();
@@ -52,6 +56,8 @@ namespace yo
 		void advance();
 
 		void consumeToken(ReservedToken token, std::string errorMessage);
+
+		void consumeIdentifier(std::string errorMessage);
 
 	private:
 		const std::unordered_map<ReservedToken, Rule> reservedRules = 

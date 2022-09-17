@@ -16,13 +16,24 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 		for (const YoctaValue& value : m_VMStack)
 			printf("[%s]", translateYoctaValue(value).c_str());
 
+		printf(" | ");
+
+		printf("Globals: %s", m_Globals.empty() ? "[]" : "");
+
+		auto it = m_Globals.begin();
+		while (it != m_Globals.end())
+		{
+			printf("[%s=%s]", it->first.c_str(), translateYoctaValue(it->second).c_str());
+			it++;
+		}
+
 		printf("\n");
 #endif
 
 #ifdef DEBUG_INTERPRETER_INSTRUCTION_TRACE
-	#ifndef DEBUG_INTERPRETER_STACK_TRACE
-			printf("\n-=-= Compiler : Disassembler =-=-");
-	#endif
+#ifndef DEBUG_INTERPRETER_STACK_TRACE
+		printf("\n-=-= Compiler : Disassembler =-=-");
+#endif
 		disassembleInstruction(set, (int)(m_IP - set.instructions.data()));
 #endif
 
@@ -44,6 +55,49 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 				m_VMStack.pop_back();
 				break;
 			}
+
+			case OPCode::OP_DEFINE_GLOBAL:
+			{
+				YoctaValue value = readYoctaValue(set);
+				if (m_Globals.find(value.getString()) != m_Globals.end())
+				{
+					throw "Constant already defined";
+					return;
+				}
+
+				m_Globals[value.getString()] = m_VMStack.back();
+				m_VMStack.pop_back();
+				break;
+			}
+			
+			case OPCode::OP_GET_GLOBAL:
+			{
+				YoctaValue value = readYoctaValue(set);
+
+				if (m_Globals.find(value.getString()) == m_Globals.end())
+				{
+					throw "Undefined constant";
+					return;
+				}
+
+				m_VMStack.push_back(m_Globals[value.getString()]);
+				break;
+			}
+
+			case OPCode::OP_SET_GLOBAL:
+			{
+				YoctaValue value = readYoctaValue(set);
+
+				if (m_Globals.find(value.getString()) == m_Globals.end())
+				{
+					throw "Undefined constant";
+					return;
+				}
+
+				m_Globals[value.getString()] = m_VMStack.back();
+				break;
+			}
+
 
 			case OPCode::OP_ADD:
 			case OPCode::OP_SUB:
