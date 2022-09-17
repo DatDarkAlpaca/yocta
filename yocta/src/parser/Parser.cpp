@@ -69,12 +69,7 @@ void yo::Parser::handleUnary()
 
 	parsePrecedence(Precedence::P_UNARY);
 
-	switch (unaryOperator.getReservedToken())
-	{
-	case ReservedToken::T_SUB:
-		m_Results.push_back({ ExpressionType::EXPR_OPERATION, Identifier("-")});
-		break;
-	}
+	m_Results.push_back({ ExpressionType::EXPR_OPERATION, unaryOperator.getReservedToken() });
 }
 
 void yo::Parser::handleBinary()
@@ -87,24 +82,7 @@ void yo::Parser::handleBinary()
 
 	parsePrecedence((Precedence)((int)rule.precedence + 1));
 
-	switch (binaryOperator.getReservedToken())
-	{
-		case ReservedToken::T_ADD:
-			m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_ADD });
-			break;
-		case ReservedToken::T_SUB:
-			m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_SUB });
-			break;
-		case ReservedToken::T_MULT:
-			m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_MULT });
-			break;
-		case ReservedToken::T_DIV:
-			m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_DIV });
-			break;
-		case ReservedToken::T_MOD:
-			m_Results.push_back({ ExpressionType::EXPR_OPERATION,  ReservedToken::T_MOD });
-			break;
-	}
+	m_Results.push_back({ ExpressionType::EXPR_OPERATION, binaryOperator.getReservedToken() });
 }
 
 void yo::Parser::handleLiteral()
