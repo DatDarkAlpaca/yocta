@@ -119,6 +119,81 @@ namespace yo
 				return YoctaValue();
 		}
 
+		YoctaValue operator&(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() & (int)other.getNumber()) };
+
+			else if (this->isBool())
+				return { double((int)this->getBool() & (int)other.getBool()) };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator|(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() | (int)other.getNumber()) };
+
+			else if (this->isBool())
+				return { double((int)this->getBool() | (int)other.getBool()) };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator^(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() ^ (int)other.getNumber()) };
+
+			else if (this->isBool())
+				return { double((int)this->getBool() ^ (int)other.getBool()) };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator<<(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() << (int)other.getNumber()) };
+
+			else if (this->isBool())
+				return { double((int)this->getBool() << (int)other.getBool()) };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator>>(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() >> (int)other.getNumber()) };
+
+			else if (this->isBool())
+				return { double((int)this->getBool() >> (int)other.getBool()) };
+
+			else
+				return YoctaValue();
+		}
+
 		friend bool operator==(const YoctaValue& lhs, const YoctaValue& rhs);
 
 		friend bool operator!=(const YoctaValue& lhs, const YoctaValue& rhs);

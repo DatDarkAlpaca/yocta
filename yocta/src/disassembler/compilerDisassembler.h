@@ -65,11 +65,33 @@ namespace yo
 			case OPCode::OP_MOD:
 				return simpleInstruction(OPCode::OP_MOD, offset);
 
+
 			case OPCode::OP_INCREMENT:
 				return simpleInstruction(OPCode::OP_INCREMENT, offset);
 
 			case OPCode::OP_DECREMENT:
 				return simpleInstruction(OPCode::OP_DECREMENT, offset);
+
+	
+
+			case OPCode::OP_BITNOT:
+				return simpleInstruction(OPCode::OP_BITNOT, offset);
+
+			case OPCode::OP_BITAND:
+				return simpleInstruction(OPCode::OP_BITAND, offset);
+
+			case OPCode::OP_BITOR:
+				return simpleInstruction(OPCode::OP_BITOR, offset);
+
+			case OPCode::OP_BITXOR:
+				return simpleInstruction(OPCode::OP_BITXOR, offset);
+
+			case OPCode::OP_BITSHIFT_LEFT:
+				return simpleInstruction(OPCode::OP_BITSHIFT_LEFT, offset);
+
+			case OPCode::OP_BITSHIFT_RIGHT:
+				return simpleInstruction(OPCode::OP_BITSHIFT_RIGHT, offset);
+
 
 			case OPCode::OP_NOT:
 				return simpleInstruction(OPCode::OP_NOT, offset);

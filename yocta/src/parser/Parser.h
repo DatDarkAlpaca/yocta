@@ -73,7 +73,7 @@ namespace yo
 			{ ReservedToken::T_INCREMENT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_DECREMENT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_NONE } },
 
-			{ ReservedToken::T_BITNOT, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
+			{ ReservedToken::T_BITNOT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_TERM } },
 			{ ReservedToken::T_BITAND, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
 			{ ReservedToken::T_BITOR, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
 			{ ReservedToken::T_BITXOR, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },

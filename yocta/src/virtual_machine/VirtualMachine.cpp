@@ -99,11 +99,19 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 			}
 
 
+			case OPCode::OP_BITNOT:
+				break;
+
 			case OPCode::OP_ADD:
 			case OPCode::OP_SUB:
 			case OPCode::OP_MULT:
 			case OPCode::OP_DIV:
 			case OPCode::OP_MOD:
+			case OPCode::OP_BITAND:
+			case OPCode::OP_BITOR:
+			case OPCode::OP_BITXOR:
+			case OPCode::OP_BITSHIFT_LEFT:
+			case OPCode::OP_BITSHIFT_RIGHT:
 			{
 				handleBinaryOperation((OPCode)instruction);
 				break;
@@ -117,6 +125,18 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 					return throw "Invalid operator argument";
 
 				YoctaValue result = { value.getNumber() + 1};
+				m_VMStack.push_back(result);
+				break;
+			}
+
+			case OP_DECREMENT:
+			{
+				YoctaValue value = m_VMStack.back();
+				m_VMStack.pop_back();
+				if (!value.isNumber())
+					return throw "Invalid operator argument";
+
+				YoctaValue result = { value.getNumber() - 1 };
 				m_VMStack.push_back(result);
 				break;
 			}
@@ -152,6 +172,26 @@ void yo::VirtualMachine::handleBinaryOperation(OPCode code)
 
 		case OP_MOD:
 			m_VMStack.push_back(a % b);
+			break;
+
+		case OP_BITAND:
+			m_VMStack.push_back(a & b);
+			break;
+
+		case OP_BITOR:
+			m_VMStack.push_back(a | b);
+			break;
+
+		case OP_BITXOR:
+			m_VMStack.push_back(a ^ b);
+			break;
+
+		case OP_BITSHIFT_LEFT:
+			m_VMStack.push_back(a << b);
+			break;
+
+		case OP_BITSHIFT_RIGHT:
+			m_VMStack.push_back(a >> b);
 			break;
 	}
 }

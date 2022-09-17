@@ -92,6 +92,25 @@ void yo::Compiler::handleOperations(YoctaValue value)
 		case ReservedToken::T_DECREMENT:
 			return m_Instructions.push_instruction(OPCode::OP_DECREMENT);
 
+		// Bitwise Operators:
+		case ReservedToken::T_BITNOT:
+			return m_Instructions.push_instruction(OPCode::OP_BITNOT);
+
+		case ReservedToken::T_BITAND:
+			return m_Instructions.push_instruction(OPCode::OP_BITAND);
+
+		case ReservedToken::T_BITOR:
+			return m_Instructions.push_instruction(OPCode::OP_BITOR);
+
+		case ReservedToken::T_BITXOR:
+			return m_Instructions.push_instruction(OPCode::OP_BITXOR);
+
+		case ReservedToken::T_BITSHIFT_LEFT:
+			return m_Instructions.push_instruction(OPCode::OP_BITSHIFT_LEFT);
+
+		case ReservedToken::T_BITSHIFT_RIGHT:
+			return m_Instructions.push_instruction(OPCode::OP_BITSHIFT_RIGHT);
+			
 		// Logical Operators:
 		case ReservedToken::T_NOT:
 			return m_Instructions.push_instruction(OPCode::OP_NOT);

@@ -23,6 +23,13 @@ namespace yo
 		OP_INCREMENT,
 		OP_DECREMENT,
 
+		OP_BITNOT,
+		OP_BITAND,
+		OP_BITOR,
+		OP_BITXOR,
+		OP_BITSHIFT_LEFT,
+		OP_BITSHIFT_RIGHT,
+
 		OP_NOT
 	};
 
@@ -63,11 +70,32 @@ namespace yo
 			case OPCode::OP_MOD:
 				return "MOD";
 
+
 			case OPCode::OP_INCREMENT:
 				return "INC";
 
 			case OPCode::OP_DECREMENT:
 				return "DEC";
+
+
+			case OPCode::OP_BITNOT:
+				return "B_NOT";
+
+			case OPCode::OP_BITAND:
+				return "B_AND";
+
+			case OPCode::OP_BITOR:
+				return "B_OR";
+
+			case OPCode::OP_BITXOR:
+				return "B_XOR";
+
+			case OPCode::OP_BITSHIFT_LEFT:
+				return "BSH_LEFT";
+
+			case OPCode::OP_BITSHIFT_RIGHT:
+				return "BSH_RIGHT";
+
 
 			case OPCode::OP_NOT:
 				return "NOT";
