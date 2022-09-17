@@ -27,6 +27,9 @@
     <ClCompile Include="src\compiler\Compiler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\virtual_machine\VirtualMachine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\.gitignore" />
@@ -36,7 +39,7 @@
     <ClInclude Include="src\common\YoctaValue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\OperationCodes.h">
+    <ClInclude Include="src\common\OperationCodes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\lexer\Lexer.h">
@@ -54,7 +57,7 @@
     <ClInclude Include="src\common\LookupTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\lexer\ReservedToken.h">
+    <ClInclude Include="src\common\ReservedToken.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\common\InputStream.h">
@@ -81,10 +84,13 @@
     <ClInclude Include="src\compiler\Compiler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\compiler\instruction_set\InstructionSet.h">
+    <ClInclude Include="src\common\instruction_set\InstructionSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\disassembler\compilerDisassembler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\virtual_machine\VirtualMachine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

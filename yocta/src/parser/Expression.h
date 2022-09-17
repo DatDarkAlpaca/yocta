@@ -7,7 +7,8 @@ namespace yo
 	{
 		EXPR_NONE,
 		EXPR_CONSTANT,
-		EXPR_OPERATION
+		EXPR_OPERATION,
+		EXPR_POP
 	};
 
 	constexpr const char* translateExpression(ExpressionType type)
@@ -20,6 +21,8 @@ namespace yo
 				return "EXPR_CONSTANT";
 			case ExpressionType::EXPR_OPERATION:
 				return "EXPR_OPERATION";
+			case ExpressionType::EXPR_POP:
+				return "EXPR_POP";
 			default:
 				throw std::invalid_argument("Unimplemented expression");
 		}

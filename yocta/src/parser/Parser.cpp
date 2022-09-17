@@ -15,14 +15,57 @@ std::vector<yo::Expression> yo::Parser::parse()
 
 	advance();
 
-	expression();
+	while (!m_CurrentToken.getValue().isEOF())
+		declaration();
+
+	finishParser();
 
 	return m_Results;
+}
+
+void yo::Parser::declaration()
+{
+	statement();
+}
+
+void yo::Parser::statement()
+{
+	if (matchesToken(ReservedToken::T_PRINT))
+		printStatement();
+	else
+		expressionStatement();
+}
+
+void yo::Parser::printStatement()
+{
+	consumeToken(ReservedToken::T_OPEN_PARENTHESIS, "Expected '('");
+
+	expression();
+
+	consumeToken(ReservedToken::T_CLOSE_PARENTHESIS, "Expected ')'");
+	
+	consumeToken(ReservedToken::T_SEMICOLON, "Expected ';'");
+
+	m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_PRINT });
+}
+
+void yo::Parser::expressionStatement()
+{
+	expression();
+
+	consumeToken(ReservedToken::T_SEMICOLON, "Expected ';'");
+
+	m_Results.push_back({ ExpressionType::EXPR_POP });
 }
 
 void yo::Parser::expression()
 {
 	parsePrecedence(Precedence::P_ASSIGNMENT);
+}
+
+void yo::Parser::finishParser()
+{
+	m_Results.push_back({ ExpressionType::EXPR_OPERATION, ReservedToken::T_NONE });
 }
 
 void yo::Parser::parsePrecedence(Precedence precedence)
@@ -46,9 +89,12 @@ void yo::Parser::parsePrecedence(Precedence precedence)
 	}
 }
 
-bool yo::Parser::matchesToken(YoctaValue value)
+bool yo::Parser::matchesToken(ReservedToken value)
 {
-	if (m_CurrentToken.getValue() != value)
+	if (!m_CurrentToken.getValue().isReservedToken())
+		return false;
+
+	if (m_CurrentToken.getValue().getReservedToken() != value)
 		return false;
 
 	advance();
@@ -90,15 +136,15 @@ void yo::Parser::handleLiteral()
 	switch (m_PreviousToken.getValue().getReservedToken())
 	{
 		case ReservedToken::T_TRUE:
-			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, true });
+			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, { true } });
 			break;
 
 		case ReservedToken::T_FALSE:
-			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, false });
+			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, { false } });
 			break;
 
 		case ReservedToken::T_NONE:
-			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, false });
+			m_Results.push_back({ ExpressionType::EXPR_CONSTANT, { false } });
 			break;
 	}
 }
@@ -123,9 +169,12 @@ void yo::Parser::advance()
 #endif
 }
 
-void yo::Parser::consumeToken(YoctaValue value, std::string errorMessage)
+void yo::Parser::consumeToken(ReservedToken token, std::string errorMessage)
 {
-	if (m_CurrentToken.getValue() == value)
+	if (!m_CurrentToken.getValue().isReservedToken())
+		throw "wtf";
+
+	if (m_CurrentToken.getValue().getReservedToken() == token)
 		return advance();
 
 	throw new ParserError(errorMessage, m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
@@ -137,7 +186,7 @@ yo::Rule yo::Parser::getRule(YoctaValue value)
 		return reservedRules.at(value.getReservedToken());
 
 	else if (value.isIdentifier())
-		return {};
+		return { };
 
 	else if (value.isString())
 		return { std::bind(&Parser::handleString, this), nullptr, Precedence::P_NONE };
@@ -146,7 +195,7 @@ yo::Rule yo::Parser::getRule(YoctaValue value)
 		return { std::bind(&Parser::handleNumber, this), nullptr, Precedence::P_NONE };
 
 	else if (value.isEOF())
-		return { nullptr, nullptr, Precedence::P_NONE };
+		return { };
 
 	return {};
 }

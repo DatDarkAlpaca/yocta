@@ -53,7 +53,72 @@ namespace yo
 
 		NULL_TYPE getNull() const { return std::get<NULL_TYPE>(value); }
 
+		value_type getValue() const { return value; }
+
 	public:
+		YoctaValue operator+(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { this->getNumber() + other.getNumber() };
+
+			else if (this->isString())
+				return { this->getString() + other.getString() };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator-(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { this->getNumber() - other.getNumber() };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator*(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { this->getNumber() * other.getNumber() };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator/(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { this->getNumber() / other.getNumber() };
+
+			else
+				return YoctaValue();
+		}
+
+		YoctaValue operator%(const YoctaValue& other) const
+		{
+			if (this->value.index() != other.value.index())
+				return YoctaValue();
+
+			if (this->isNumber())
+				return { double((int)this->getNumber() % (int)other.getNumber()) };
+
+			else
+				return YoctaValue();
+		}
+
 		friend bool operator==(const YoctaValue& lhs, const YoctaValue& rhs);
 
 		friend bool operator!=(const YoctaValue& lhs, const YoctaValue& rhs);
@@ -140,5 +205,7 @@ namespace yo
 
 		else if (value.isNull())
 			return "null";
+
+		return "Unknown YoctaValue";
 	}
 }

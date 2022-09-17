@@ -91,9 +91,14 @@ namespace yo
 		T_TRUE,						// true
 		T_FALSE,					// false
 		T_NULL,						// null
+
+		// Testing:
+		T_PRINT,					// print
 	};
 
 	inline const LookupTable<std::string_view, ReservedToken> operatorTokenTable{
+		{ "-*-", ReservedToken::T_NONE },
+
 		{ "+", ReservedToken::T_ADD },
 		{ "-", ReservedToken::T_SUB },
 		{ "*", ReservedToken::T_MULT },

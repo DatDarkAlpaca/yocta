@@ -1,4 +1,6 @@
 #pragma once
+#include "OperationCodes.h"
+#include "InstructionSet.h"
 
 namespace yo
 {
@@ -22,7 +24,7 @@ namespace yo
 		}
 	}
 
-	int disassembleInstruction(const InstructionSet& set, int offset)
+	inline int disassembleInstruction(const InstructionSet& set, int offset)
 	{
 		printf("%04d\t", offset);
 
@@ -30,8 +32,14 @@ namespace yo
 		
 		switch (instruction)
 		{
+			case OPCode::None:
+				return simpleInstruction(OPCode::None, offset);
+
 			case OPCode::OP_PUSH_LITERAL:
 				return constantInstruction(OPCode::OP_PUSH_LITERAL, set, offset);
+
+			case OPCode::OP_POP:
+				return simpleInstruction(OPCode::OP_POP, offset);
 
 			case OPCode::OP_ADD:
 				return simpleInstruction(OPCode::OP_ADD, offset);
@@ -47,6 +55,15 @@ namespace yo
 
 			case OPCode::OP_MOD:
 				return simpleInstruction(OPCode::OP_MOD, offset);
+
+			case OPCode::OP_INCREMENT:
+				return simpleInstruction(OPCode::OP_INCREMENT, offset);
+
+			case OPCode::OP_DECREMENT:
+				return simpleInstruction(OPCode::OP_DECREMENT, offset);
+
+			case OPCode::OP_NOT:
+				return simpleInstruction(OPCode::OP_NOT, offset);
 
 			default:
 				printf("Unknown opcode [%s]\n", translateCode((OPCode)instruction).c_str());

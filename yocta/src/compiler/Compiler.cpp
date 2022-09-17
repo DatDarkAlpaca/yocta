@@ -21,35 +21,61 @@ void yo::Compiler::handleExpression(const Expression& expression)
 			break;
 
 		case ExpressionType::EXPR_CONSTANT:
-			handleConstants(expression.value);
-			break;
+			return handleConstants(expression.value);
 
 		case ExpressionType::EXPR_OPERATION:
-			handleOperations(expression.value);
-			break;			
+			return handleOperations(expression.value);
+
+		case ExpressionType::EXPR_POP:
+			return m_Instructions.push_instruction(OPCode::OP_POP);
 	}
 }
 
 void yo::Compiler::handleConstants(YoctaValue value)
 {
 	if (value.isNumber())
-		m_Instructions.push_back(value.getNumber());
+		m_Instructions.push_number(value.getNumber());
+
+	else if(value.isBool())
+		m_Instructions.push_bool(value.getBool());
 }
 
 void yo::Compiler::handleOperations(YoctaValue value)
 {
-	if (value.getReservedToken() == ReservedToken::T_ADD)
-		m_Instructions.push_instruction(OPCode::OP_ADD);
+	if (!value.isReservedToken())
+		throw "Undefined operation";
 
-	else if (value.getReservedToken() == ReservedToken::T_SUB)
-		m_Instructions.push_instruction(OPCode::OP_SUB);
+	auto token = value.getReservedToken();
+	switch (token)
+	{
+		case ReservedToken::T_NONE:
+			return m_Instructions.push_instruction(OPCode::None);
 
-	else if (value.getReservedToken() == ReservedToken::T_MULT)
-		m_Instructions.push_instruction(OPCode::OP_MULT);
+		// Arithmetic Operators:
+		case ReservedToken::T_ADD:
+			return m_Instructions.push_instruction(OPCode::OP_ADD);
 
-	else if (value.getReservedToken() == ReservedToken::T_DIV)
-		m_Instructions.push_instruction(OPCode::OP_DIV);
+		case ReservedToken::T_SUB:
+			return m_Instructions.push_instruction(OPCode::OP_SUB);
 
-	else if (value.getReservedToken() == ReservedToken::T_MOD)
-		m_Instructions.push_instruction(OPCode::OP_MOD);
+		case ReservedToken::T_MULT:
+			return m_Instructions.push_instruction(OPCode::OP_MULT);
+
+		case ReservedToken::T_DIV:
+			return m_Instructions.push_instruction(OPCode::OP_DIV);
+
+		case ReservedToken::T_MOD:
+			return m_Instructions.push_instruction(OPCode::OP_MOD);
+
+		// Increment & Decrement:
+		case ReservedToken::T_INCREMENT:
+			return m_Instructions.push_instruction(OPCode::OP_INCREMENT);
+
+		case ReservedToken::T_DECREMENT:
+			return m_Instructions.push_instruction(OPCode::OP_DECREMENT);
+
+		// Logical Operators:
+		case ReservedToken::T_NOT:
+			return m_Instructions.push_instruction(OPCode::OP_NOT);
+	}
 }

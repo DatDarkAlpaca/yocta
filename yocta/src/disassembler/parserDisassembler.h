@@ -17,11 +17,14 @@ namespace yo
 
 			printf("%s\t", translateExpression(expression.type));
 
-			if (exprValue.isReservedToken() || exprValue.isEOF())
+			if (exprValue.isReservedToken())
 			{
 				auto a = tokenConversionTable.find(exprValue.getReservedToken());
 				printf("%s\n", (*a).second.data());
 			}
+
+			else if (exprValue.isEOF())
+				printf("\n");
 
 			else
 				printf("%s\n", translateYoctaValue(exprValue).c_str());

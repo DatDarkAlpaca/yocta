@@ -14,14 +14,24 @@ namespace yo
 			instructions.push_back(code);
 		}
 
-		void push_back(double number)
+		void push_number(double number)
 		{
 			instructions.push_back(OPCode::OP_PUSH_LITERAL);
 
 			constants.push_back({ number });
 			size_t index = constants.size() - 1;
 
-			instructions.push_back((size_t)index);
+			instructions.push_back((uint8_t)index);
+		}
+
+		void push_bool(bool boolean)
+		{
+			instructions.push_back(OPCode::OP_PUSH_LITERAL);
+
+			constants.push_back({ boolean });
+			size_t index = constants.size() - 1;
+
+			instructions.push_back((uint8_t)index);
 		}
 
 	public:

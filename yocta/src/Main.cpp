@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "VirtualMachine.h"
 #include "InputStream.h"
 #include "Compiler.h"
 #include "Parser.h"
@@ -14,7 +15,7 @@ int main()
 {
 	using namespace yo;
 
-	std::string_view input = "(1 - 5 * (2 + 3));\ntrue;";
+	std::string_view input = "++1+2%2;";
 	InputStream stream(input);
 
 	Parser parser(stream);
@@ -28,5 +29,10 @@ int main()
 	Compiler compiler(expressions);
 	InstructionSet set = compiler.compile();
 
+#ifdef DEBUG_COMPILER_TRACE
 	disassembleInstructionSet(set);
+#endif
+
+	VirtualMachine virtualMachine;
+	virtualMachine.execute(set);
 }
