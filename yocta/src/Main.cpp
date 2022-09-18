@@ -1,5 +1,6 @@
 #include <iostream>
 #include <sstream>
+#include <fstream>
 
 #include "VirtualMachine.h"
 #include "InputStream.h"
@@ -11,6 +12,30 @@
 #include "compilerDisassembler.h"
 #include "parserDisassembler.h"
 
+void execute(std::string_view source)
+{
+	using namespace yo;
+
+	InputStream stream(source);
+
+	Parser parser(stream);
+	auto expressions = parser.parse();
+
+#ifdef DEBUG_PARSER_TRACE
+	disassembleParser(expressions);
+	printf("\n");
+#endif
+
+	Compiler compiler(expressions);
+	InstructionSet set = compiler.compile();
+
+#ifdef DEBUG_COMPILER_TRACE
+	disassembleInstructionSet(set);
+#endif
+
+	VirtualMachine virtualMachine;
+	virtualMachine.execute(set);
+}
 
 void inlineInterpreter()
 {
@@ -25,27 +50,11 @@ void inlineInterpreter()
 		std::string input;
 		std::getline(std::cin, input);
 
-		try
-		{
-			InputStream stream(input);
+		if (input == "exit" || input == "quit")
+			break;
 
-			Parser parser(stream);
-			auto expressions = parser.parse();
-
-#ifdef DEBUG_PARSER_TRACE
-			disassembleParser(expressions);
-			printf("\n");
-#endif
-
-			Compiler compiler(expressions);
-			InstructionSet set = compiler.compile();
-
-#ifdef DEBUG_COMPILER_TRACE
-			disassembleInstructionSet(set);
-#endif
-
-			VirtualMachine virtualMachine;
-			virtualMachine.execute(set);
+		try {
+			execute(input);
 		}
 		catch (const Error& e) {
 			printf("<Line: %d [CI: %d]> %s\n", (int)e.getLineNumber(), (int)e.getCharIndex(), e.what());
@@ -53,11 +62,29 @@ void inlineInterpreter()
 	}
 }
 
-void runFile(const char* filepath)
+std::string_view readFile(std::string_view filepath)
 {
+	std::ifstream file(filepath.data());
 
+	if (!file.good())
+	{
+		fprintf(stderr, "An error has occurred while opening the source file.");
+		exit(1);
+	}
+
+	std::stringstream stringBuffer;
+	stringBuffer << file.rdbuf();
+
+	return stringBuffer.str();
 }
 
+void runFile(const char* filepath)
+{
+	using namespace yo;
+
+	std::string_view source = readFile(filepath);
+	execute(source);
+}
 
 int main(int argc, char** argv)
 {
