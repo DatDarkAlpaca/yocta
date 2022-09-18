@@ -40,17 +40,17 @@ namespace yo
 	private:
 		void handleGrouping();
 
-		void handleVariable();
+		void handleVariable(bool canAssign);
 
-		void handleUnary();
+		void handleUnary(bool canAssign);
 
-		void handleBinary();
+		void handleBinary(bool canAssign);
 
-		void handleLiteral();
+		void handleLiteral(bool canAssign);
 
-		void handleNumber();
+		void handleNumber(bool canAssign);
 
-		void handleString();
+		void handleString(bool canAssign);
 
 	private:
 		void advance();
@@ -64,23 +64,23 @@ namespace yo
 		{
 			{ ReservedToken::T_NONE, { nullptr, nullptr, Precedence::P_NONE } },
 
-			{ ReservedToken::T_ADD, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
-			{ ReservedToken::T_SUB, { std::bind(&Parser::handleUnary, this), std::bind(&Parser::handleBinary, this), Precedence::P_TERM }, },
-			{ ReservedToken::T_MULT, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_FACTOR } },
-			{ ReservedToken::T_DIV, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_FACTOR } },
-			{ ReservedToken::T_MOD, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
+			{ ReservedToken::T_ADD, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
+			{ ReservedToken::T_SUB, { std::bind(&Parser::handleUnary, this, false), std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM }, },
+			{ ReservedToken::T_MULT, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_FACTOR } },
+			{ ReservedToken::T_DIV, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_FACTOR } },
+			{ ReservedToken::T_MOD, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
 
-			{ ReservedToken::T_INCREMENT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_NONE } },
-			{ ReservedToken::T_DECREMENT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_INCREMENT, { std::bind(&Parser::handleUnary, this, false), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_DECREMENT, { std::bind(&Parser::handleUnary, this, false), nullptr, Precedence::P_NONE } },
 
-			{ ReservedToken::T_BITNOT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_TERM } },
-			{ ReservedToken::T_BITAND, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
-			{ ReservedToken::T_BITOR, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
-			{ ReservedToken::T_BITXOR, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
-			{ ReservedToken::T_BITSHIFT_LEFT, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
-			{ ReservedToken::T_BITSHIFT_RIGHT, { nullptr, std::bind(&Parser::handleBinary, this), Precedence::P_TERM } },
+			{ ReservedToken::T_BITNOT, { std::bind(&Parser::handleUnary, this, false), nullptr, Precedence::P_TERM } },
+			{ ReservedToken::T_BITAND, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
+			{ ReservedToken::T_BITOR, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
+			{ ReservedToken::T_BITXOR, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
+			{ ReservedToken::T_BITSHIFT_LEFT, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
+			{ ReservedToken::T_BITSHIFT_RIGHT, { nullptr, std::bind(&Parser::handleBinary, this, false), Precedence::P_TERM } },
 
-			{ ReservedToken::T_NOT, { std::bind(&Parser::handleUnary, this), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_NOT, { std::bind(&Parser::handleUnary, this, false), nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_AND, { nullptr, nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_OR, { nullptr, nullptr, Precedence::P_NONE } },
 
@@ -113,7 +113,7 @@ namespace yo
 
 			{ ReservedToken::T_OPEN_BRACES, { nullptr, nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_CLOSE_BRACES, { nullptr, nullptr, Precedence::P_NONE } },
-			
+
 			{ ReservedToken::T_QUESTION_MARK, { nullptr, nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_COLON, { nullptr, nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_SEMICOLON, { nullptr, nullptr, Precedence::P_NONE } },
@@ -136,9 +136,9 @@ namespace yo
 			{ ReservedToken::T_BREAK, { nullptr, nullptr, Precedence::P_NONE } },
 			{ ReservedToken::T_RETURN, { nullptr, nullptr, Precedence::P_NONE } },
 
-			{ ReservedToken::T_TRUE, { std::bind(&Parser::handleLiteral, this), nullptr, Precedence::P_NONE } },
-			{ ReservedToken::T_FALSE, { std::bind(&Parser::handleLiteral, this), nullptr, Precedence::P_NONE } },
-			{ ReservedToken::T_NULL, { std::bind(&Parser::handleLiteral, this), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_TRUE, { std::bind(&Parser::handleLiteral, this, true), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_FALSE, { std::bind(&Parser::handleLiteral, this, true), nullptr, Precedence::P_NONE } },
+			{ ReservedToken::T_NULL, { std::bind(&Parser::handleLiteral, this, true), nullptr, Precedence::P_NONE } },
 
 			{ ReservedToken::T_PRINT, { nullptr, nullptr, Precedence::P_NONE } }
 		};

@@ -4,7 +4,7 @@
 
 namespace yo
 {
-	using rule_type = std::function<void()>;
+	using rule_type = std::function<void(bool)>;
 
 	struct Rule
 	{

@@ -16,13 +16,6 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 		for (const YoctaValue& value : m_VMStack)
 			printf("[%s]", translateYoctaValue(value).c_str());
 
-		auto it = m_Globals.begin();
-		while (it != m_Globals.end())
-		{
-			printf("[%s=%s]", it->first.c_str(), translateYoctaValue(it->second).c_str());
-			it++;
-		}
-
 		printf("\n");
 
 #endif
