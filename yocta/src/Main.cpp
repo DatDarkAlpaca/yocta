@@ -12,7 +12,7 @@
 #include "compilerDisassembler.h"
 #include "parserDisassembler.h"
 
-void execute(std::string_view source)
+void execute(std::string_view source, yo::VirtualMachine& virtualMachine)
 {
 	using namespace yo;
 
@@ -33,7 +33,6 @@ void execute(std::string_view source)
 	disassembleInstructionSet(set);
 #endif
 
-	VirtualMachine virtualMachine;
 	virtualMachine.execute(set);
 }
 
@@ -54,7 +53,7 @@ void inlineInterpreter()
 			break;
 
 		try {
-			execute(input);
+			execute(input, virtualMachine);
 		}
 		catch (const Error& e) {
 			printf("<Line: %d [CI: %d]> %s\n", (int)e.getLineNumber(), (int)e.getCharIndex(), e.what());
@@ -82,8 +81,10 @@ void runFile(const char* filepath)
 {
 	using namespace yo;
 
+	VirtualMachine virtualMachine;
+
 	std::string_view source = readFile(filepath);
-	execute(source);
+	execute(source, virtualMachine);
 }
 
 int main(int argc, char** argv)
