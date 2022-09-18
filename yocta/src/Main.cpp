@@ -11,28 +11,63 @@
 #include "compilerDisassembler.h"
 #include "parserDisassembler.h"
 
-int main()
+
+void inlineInterpreter()
 {
 	using namespace yo;
 
-	std::string_view input = "var a = 2; a = 1; a;";
-	InputStream stream(input);
+	VirtualMachine virtualMachine;
 
-	Parser parser(stream);
-	auto expressions = parser.parse();
+	while (true)
+	{
+		printf("> ");
+
+		std::string input;
+		std::getline(std::cin, input);
+
+		try
+		{
+			InputStream stream(input);
+
+			Parser parser(stream);
+			auto expressions = parser.parse();
 
 #ifdef DEBUG_PARSER_TRACE
-	disassembleParser(expressions);
-	printf("\n");
+			disassembleParser(expressions);
+			printf("\n");
 #endif
 
-	Compiler compiler(expressions);
-	InstructionSet set = compiler.compile();
+			Compiler compiler(expressions);
+			InstructionSet set = compiler.compile();
 
 #ifdef DEBUG_COMPILER_TRACE
-	disassembleInstructionSet(set);
+			disassembleInstructionSet(set);
 #endif
 
-	VirtualMachine virtualMachine;
-	virtualMachine.execute(set);
+			VirtualMachine virtualMachine;
+			virtualMachine.execute(set);
+		}
+		catch (const Error& e) {
+			printf("<Line: %d [CI: %d]> %s\n", (int)e.getLineNumber(), (int)e.getCharIndex(), e.what());
+		}
+	}
+}
+
+void runFile(const char* filepath)
+{
+
+}
+
+
+int main(int argc, char** argv)
+{
+	if (argc == 1)
+		inlineInterpreter();
+	else if (argc == 2)
+		runFile(argv[1]);
+	else
+	{
+		fprintf(stderr, "Usage: yocta <filepath>\n");
+		return 1;
+	}
 }

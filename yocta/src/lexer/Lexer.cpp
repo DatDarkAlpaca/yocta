@@ -114,7 +114,7 @@ namespace
 		if (character != '"')
 		{
 			stream.pushCharacter(character);
-			throw new LexingError("Missing close quote", stream.getLineNumber(), stream.getCharIndex());
+			throw LexingError("Missing close quote", stream.getLineNumber(), stream.getCharIndex());
 		}
 
 		return Token({ string }, lineNumber, charIndex);
@@ -397,7 +397,7 @@ namespace
 		if (reserved != ReservedToken::T_NONE)
 			return Token({ reserved }, lineNumber, charIndex);
 
-		throw new LexingError("Unexpected token", lineNumber, charIndex);
+		throw LexingError("Unexpected token", lineNumber, charIndex);
 		return {};
 	}
 

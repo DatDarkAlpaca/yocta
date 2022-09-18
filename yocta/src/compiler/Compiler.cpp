@@ -1,4 +1,5 @@
 #include "Compiler.h"
+#include "Error.h"
 
 yo::Compiler::Compiler(const std::vector<Expression>& expressions)
 	: m_Expressions(expressions)
@@ -61,7 +62,7 @@ void yo::Compiler::handleConstants(YoctaValue value)
 void yo::Compiler::handleOperations(YoctaValue value)
 {
 	if (!value.isReservedToken())
-		throw "Undefined operation";
+		throw CompilerError("Undefined operation", 0, 0);
 
 	auto token = value.getReservedToken();
 	switch (token)

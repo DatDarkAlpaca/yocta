@@ -1,4 +1,5 @@
 #include "VirtualMachine.h"
+#include "Error.h"
 
 void yo::VirtualMachine::execute(InstructionSet& set)
 {
@@ -50,10 +51,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 			{
 				YoctaValue value = readYoctaValue(set);
 				if (m_Globals.find(value.getString()) != m_Globals.end())
-				{
-					throw "Constant already defined";
-					return;
-				}
+					throw VirtualMachineError("Global already defined", 0, 0);
 
 				m_Globals[value.getString()] = m_VMStack.back();
 				m_VMStack.pop_back();
@@ -65,10 +63,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 				YoctaValue value = readYoctaValue(set);
 
 				if (m_Globals.find(value.getString()) == m_Globals.end())
-				{
-					throw "Undefined constant";
-					return;
-				}
+					throw VirtualMachineError("Undefined variable", 0, 0);
 
 				m_VMStack.push_back(m_Globals[value.getString()]);
 				break;
@@ -79,10 +74,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 				YoctaValue value = readYoctaValue(set);
 
 				if (m_Globals.find(value.getString()) == m_Globals.end())
-				{
-					throw "Undefined constant";
-					return;
-				}
+					throw VirtualMachineError("Undefined constant", 0, 0);
 
 				m_Globals[value.getString()] = m_VMStack.back();
 				break;
@@ -112,7 +104,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 				YoctaValue value = m_VMStack.back();
 				m_VMStack.pop_back();
 				if (!value.isNumber())
-					return throw "Invalid operator argument";
+					throw VirtualMachineError("Invalid operator argument", 0, 0);
 
 				YoctaValue result = { value.getNumber() + 1};
 				m_VMStack.push_back(result);
@@ -124,7 +116,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 				YoctaValue value = m_VMStack.back();
 				m_VMStack.pop_back();
 				if (!value.isNumber())
-					return throw "Invalid operator argument";
+					throw VirtualMachineError("Invalid operator argument", 0, 0);
 
 				YoctaValue result = { value.getNumber() - 1 };
 				m_VMStack.push_back(result);

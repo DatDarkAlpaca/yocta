@@ -93,7 +93,7 @@ void yo::Parser::parsePrecedence(Precedence precedence)
 
 	if (!prefix)
 	{
-		throw new ParserError("Expected expression", m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
+		throw ParserError("Expected expression", m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 		return;
 	}
 
@@ -107,7 +107,7 @@ void yo::Parser::parsePrecedence(Precedence precedence)
 		infix(canAssign);
 
 		if (canAssign && matchesToken(ReservedToken::T_ASSIGN))
-			throw "Invalid assignment value.";
+			throw ParserError("Invalid assignment value.", m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 	}
 }
 
@@ -146,7 +146,7 @@ void yo::Parser::handleUnary(bool canAssign)
 {
 	YoctaValue unaryOperator = m_PreviousToken.getValue();
 	if (!unaryOperator.isReservedToken())
-		throw new ParserError("Invalid unary operator", m_CurrentToken.getLineNumber(), m_PreviousToken.getCharIndex());
+		throw ParserError("Invalid unary operator", m_CurrentToken.getLineNumber(), m_PreviousToken.getCharIndex());
 
 	parsePrecedence(Precedence::P_UNARY);
 
@@ -157,7 +157,7 @@ void yo::Parser::handleBinary(bool canAssign)
 {
 	YoctaValue binaryOperator = m_PreviousToken.getValue();
 	if (!binaryOperator.isReservedToken())
-		throw new ParserError("Invalid unary operator", m_CurrentToken.getLineNumber(), m_PreviousToken.getCharIndex());
+		throw ParserError("Invalid unary operator", m_CurrentToken.getLineNumber(), m_PreviousToken.getCharIndex());
 
 	Rule rule = getRule(binaryOperator);
 
@@ -207,18 +207,18 @@ void yo::Parser::advance()
 void yo::Parser::consumeToken(ReservedToken token, std::string errorMessage)
 {
 	if (!m_CurrentToken.getValue().isReservedToken())
-		throw "wtf";
+		throw ParserError(errorMessage, m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 
 	if (m_CurrentToken.getValue().getReservedToken() == token)
 		return advance();
 
-	throw new ParserError(errorMessage, m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
+	throw ParserError(errorMessage, m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 }
 
 void yo::Parser::consumeIdentifier(std::string errorMessage)
 {
 	if (!m_CurrentToken.getValue().isIdentifier())
-		throw "Invalid identifier";
+		throw ParserError("Invalid identifier", m_CurrentToken.getLineNumber(), m_CurrentToken.getCharIndex());
 
 	advance();
 }

@@ -45,4 +45,18 @@ namespace yo
 		ParserError(std::string details, size_t lineNumber, size_t charIndex)
 			: Error("Parser Error: " + details, lineNumber, charIndex) { }
 	};
+
+	class CompilerError : public Error
+	{
+	public:
+		CompilerError(std::string details, size_t lineNumber, size_t charIndex)
+			: Error("Compiler Error: " + details, lineNumber, charIndex) { }
+	};
+
+	class VirtualMachineError : public Error
+	{
+	public:
+		VirtualMachineError(std::string details, size_t lineNumber, size_t charIndex)
+			: Error("VM Error: " + details, lineNumber, charIndex) { }
+	};
 }
