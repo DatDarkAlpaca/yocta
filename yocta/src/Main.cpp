@@ -15,7 +15,7 @@ int main()
 {
 	using namespace yo;
 
-	std::string_view input = "1&2;";
+	std::string_view input = "var a = 1&2;";
 	InputStream stream(input);
 
 	Parser parser(stream);

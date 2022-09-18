@@ -11,14 +11,10 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 	while (true)
 	{
 #ifdef DEBUG_INTERPRETER_STACK_TRACE
-		printf("Stack: %s", m_VMStack.empty() ? "[]" : "");
+		printf("\tStack: %s", m_VMStack.empty() ? "[]" : "");
 
 		for (const YoctaValue& value : m_VMStack)
 			printf("[%s]", translateYoctaValue(value).c_str());
-
-		printf(" | ");
-
-		printf("Globals: %s", m_Globals.empty() ? "[]" : "");
 
 		auto it = m_Globals.begin();
 		while (it != m_Globals.end())
@@ -28,6 +24,7 @@ void yo::VirtualMachine::execute(InstructionSet& set)
 		}
 
 		printf("\n");
+
 #endif
 
 #ifdef DEBUG_INTERPRETER_INSTRUCTION_TRACE
